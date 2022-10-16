@@ -1,0 +1,7 @@
+base   structtasks
+author Chris MacMackin
+email  cmacmackin@gmail.com
+date   2022-10-16
+name   structtasks plugin
+desc   Send reminder emails for tasks stored as struct data
+url    https://github.com/cmacmackin/dokuwiki-plugin-structtasks
