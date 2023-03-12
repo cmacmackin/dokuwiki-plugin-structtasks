@@ -8,15 +8,22 @@
 class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
 {
 
+    private $notifiers = array();
+
+    public function __constructor() {
+        // Insantiate the Notifier objects
+    }
+    
     /** @inheritDoc */
     public function register(Doku_Event_Handler $controller)
     {
-        $controller->register_hook('COMMON_WIKIPAGE_SAVE', 'FIXME', $this, 'handle_common_wikipage_save');
+        // This must run AFTER the Struct plugin has updated the metadata
+        $controller->register_hook('COMMON_WIKIPAGE_SAVE', 'AFTER', $this, 'handle_common_wikipage_save', null, 3999);
    
     }
 
     /**
-     * FIXME Event handler for
+     * Event handler for notifying task assignees of task changes or creation
      *
      * @param Doku_Event $event  event object by reference
      * @param mixed      $param  optional parameter passed when event was registered
@@ -24,6 +31,37 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
      */
     public function handle_common_wikipage_save(Doku_Event $event, $param)
     {
+        // Check if schema assigned to this page
+        $struct = $this->loadHelper('struct', true);
+        $newMetaData = $struct->getData($event->id, $this->getConf('schema'), $event->newRevision);
+        if (count($newMetaData) == 0) {
+            return;
+        }
+
+        // Fetch struct data from before and after the edit
+
+        // Work out what changes have been made
+        $new_data = array(
+            'content' => '',
+            'duedate' => '',
+            'assignees' => [],
+            'status' => '',
+        );
+        $old_data = array();
+        
+        /* Send email to assignees that WEREN'T THE EDITOR if
+         *   - They have been newly assigned to task
+         *   - They have been removed from the task
+         *   - Someone else has removed THEMSELVES from the task
+         *   - The due date has changed
+         *   - The task status changes
+         *   - The task page is deleted
+         *   - Someone has updated the task?
+         */
+
+        // Subscribe new assignees to the page?
+
+        // Unsubscribe any assignees that have been removed?
     }
 
 }
