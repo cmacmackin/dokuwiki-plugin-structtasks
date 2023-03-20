@@ -37,6 +37,7 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         if (count($newMetaData) == 0) {
             return;
         }
+        $title = p_get_first_heading($event->id, METADATA_RENDER_USING_SIMPLE_CACHE);
 
         // Fetch struct data from before and after the edit
 

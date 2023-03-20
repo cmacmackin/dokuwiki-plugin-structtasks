@@ -7,11 +7,15 @@
  *
  */
 
+namespace dokuwiki\plugin\structtasks\meta;
+
 /**
  * Abstract base class to handle sending emails about changes to task
  * state. Each subclass will provide a function which returns a list
  * of users to be notified (empty if no notification is required) and
  * template text for the email message.
+ *
+ * @package dokuwiki\plugin\structtasks\meta
  *
  */
 abstract class AbstractNotifier
@@ -54,17 +58,6 @@ abstract class AbstractNotifier
     }
 
     abstract function getNotifiableUsers($page, $editor, $new_data, $old_data);
-    public function sendMessage($page, $editor, $new_data, $old_data, $edit_message) {
-    }
-}
-
-
-/**
- * Notifies a user when they are assigned to a task.
- */
-class AssignedNotifier extends AbstractNotifier
-{
-    const lang_key_prefix = 'assigned';
-    public function getNotifiableUsers($page, $editor, $new_data, $old_data) {
+    public function sendMessage($page_id, $page_title, $editor, $new_data, $old_data, $edit_message, $mailer = new Mailer()) {
     }
 }

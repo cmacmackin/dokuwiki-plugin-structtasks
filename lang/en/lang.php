@@ -59,7 +59,7 @@ $lang['closedstatus_text'] = <<<'END'
 no longer considered active and you will receive no further emails about it.
 END;
 
-$lang['deleted_subject'] = 'Task "@TITLE@" has been deleted"';
+$lang['deleted_subject'] = 'Task "@TITLE@" has been deleted';
 $lang['deleted_text'] = '@EDITOR@ has deleted the task @TITLELINK@ on @WIKINAME@. No further action is required.';
 $lang['deleted_text'] = <<<'END'
 <h1>@WIKINAME@ Task Deleted</h1>
