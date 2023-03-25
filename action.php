@@ -34,12 +34,15 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         // Check if schema assigned to this page
         $struct = $this->loadHelper('struct', true);
         $newMetaData = $struct->getData($event->id, $this->getConf('schema'), $event->newRevision);
+        // If no struct data assigned, then do nothing
         if (count($newMetaData) == 0) {
             return;
         }
+
         $title = p_get_first_heading($event->id, METADATA_RENDER_USING_SIMPLE_CACHE);
 
         // Fetch struct data from before and after the edit
+        // FIXME: Make sure to consider page creation; should basically make old metadata empty, but the helper plugin might not do that for me.
 
         // Work out what changes have been made
         $new_data = array(
@@ -65,5 +68,29 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         // Unsubscribe any assignees that have been removed?
     }
 
+    /**
+     * Return a string with the real name and email address of $user,
+     * suitable for using to send them an email.
+     */
+    static function getUserEmail($user) {
+        global $auth;
+        $userData = $auth->getUserData($user, false);
+        if ($userData === false) {
+            return false;
+        }
+        $realname = $userData['name'];
+        $email = $userData['mail'];
+        if ($realname === '') return $email;
+        if (strpos($userData['name'], ',')) $realname = '"' . $realname;
+        return "${realname} <${email}>";
+    }
+
+    /**
+     * Convert a list of usernames into a list of formatted email
+     * addresses.
+     */
+    static function assigneesToEmails($assignees) {
+        return array_filter(array_map([$this, 'getUserEmail'], $assignees), strlen);
+    }
 }
 
