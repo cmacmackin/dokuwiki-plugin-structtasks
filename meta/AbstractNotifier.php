@@ -41,7 +41,7 @@ abstract class AbstractNotifier
      *   - @WIKINAME@
      *
      */
-    const lank_key_prefix = 'DUMMY';
+    const lang_key_prefix = 'DUMMY';
 
     /**
      * Callable to get configurations for this plugin.
@@ -52,12 +52,42 @@ abstract class AbstractNotifier
      */
     protected $getLang;
 
-    public function __constructor(callable $getConf, callable $getLang) {
+    public function __construct(callable $getConf, callable $getLang) {
         $this->getConf = $getConf;
         $this->getLang = $getLang;
     }
 
     abstract function getNotifiableUsers($page, $editor, $new_data, $old_data);
-    public function sendMessage($page_id, $page_title, $editor, $new_data, $old_data, $edit_message, $mailer = new Mailer()) {
+
+    public function sendMessage($page_id, $page_title, $editor, $new_data,
+                                $old_data, $mailer = new Mailer()) {
+        global $conf;
+        $getLang = $this->getLang;
+        $url = wl($page_id, [], true);
+        $text_subs = [
+            'TITLE' => $page_title,
+            'TITLELINK' => "${page_title} <${url}>",
+            'EDITURL' => wl($page_id, ['do' => 'edit'], true, '&'),
+            'EDITOR' => $editor,
+            'STATUS' => $new_data['status'],
+            'PREVSTATUS' => $old_data['status'],
+            'DUEDATE' => $new_data['duedate'],
+            'PREVDUEDATE' => $old_data['duedate'],
+            'WIKINAME' => $conf['title'],
+        ];
+        $html_subs = ['TITLELINK' => "<a href=\"${url}\">${page_title}</a>"];
+        $subject = str_replace(
+            array_map(function ($x) {return "@$x@";}, array_keys($text_subs)),
+            $text_subs,
+            $getLang($this::lang_key_prefix . '_subject'));
+        $mailer->setBody($getLang($this::lang_key_prefix . '_text'),
+                         $text_subs, $html_subs,
+                         $getLang($this::lang_key_prefix . '_html'));
+        foreach ($this->getNotifiableUsers($page_id, $editor, $new_data, $old_data)
+                 as $user) {
+            $mailer->to($user);
+            $mailer->subject($subject);
+            $mailer->send();
+        }
     }
 }
