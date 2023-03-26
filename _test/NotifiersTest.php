@@ -25,8 +25,7 @@ use dokuwiki\plugin\structtasks\meta\SelfRemovalNotifier;
 
 class notifiers_plugin_structtasks_test extends DokuWikiTest {
 
-    const subject = <<<'END'
-Check substitutions:
+    const subject = 'Check substitutions:
 @TITLE@
 @TITLELINK@
 @EDITURL@
@@ -35,8 +34,7 @@ Check substitutions:
 @PREVSTATUS@
 @DUEDATE@
 @PREVDUEDATE@
-@WIKINAME@
-END;
+@WIKINAME@';
     private $expected_subject;
     private $text_replacements;
     private $html_replacements;
@@ -46,19 +44,15 @@ END;
     const page_title = 'Task Title';
     const editor = 'Some User <some.user@example.com>';
     const new_data = [
-        'content' => <<<'END'
-====== Task Title ======
-Brief updated description of the task.
-END,
+        'content' => '====== Task Title ======
+Brief updated description of the task.',
         'duedate' => '2023/03/19',
         'assignees' => ['User One <user1@thing.com>', 'User 2 <u2@abc.com>', 'Third Guy <guy3@abc.com>', 'Some User <some.user@example.com>'],
         'status' => 'Complete',
     ];
     const old_data = [
-        'content' => <<<'END'
-====== Old Title ======
-Brief description of the task.
-END,
+        'content' => '====== Old Title ======
+Brief description of the task.',
         'duedate' => '2023/03/12',
         'assignees' => [ 'User 2 <u2@abc.com>', 'Third Guy <guy3@abc.com>', 'User Four <u4@thingy.co.uk', 'Some User <some.user@example.com>'],
         'status' => 'Ongoing',
