@@ -129,6 +129,12 @@ class Utilities
      * AbstractNotifier::sendMessage
      */
     function getOldData($eventdata, $structdata) {
+        return [
+            'content' => $eventdata['oldContent'],
+            'duedate' => $structdata['duedate'],
+            'assignees' => $this->assigneesToEmails($structdata['assignees']),
+            'status' => $structdata['status'],
+        ];
     }
 
     /**
@@ -136,7 +142,12 @@ class Utilities
      * AbstractNotifier::sendMessage
      */
     function getNewData($eventdata, $structdata) {
-        $newMetaData = $this->struct->getData($event->id, $this->getConf('schema'), $event->newRevision);
+        return [
+            'content' => $eventdata['newContent'],
+            'duedate' => $structdata['duedate'],
+            'assignees' => $this->assigneesToEmails($structdata['assignees']),
+            'status' => $structdata['status'],
+        ];
     }
 
 }

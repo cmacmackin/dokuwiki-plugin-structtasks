@@ -168,6 +168,22 @@ class utilities_simple_plugin_structtakss_test extends \DokuWikiTest {
         $auth->createUser('user1', 'abcdefg', 'Arron Dom Person', 'adperson@example.com');
         $auth->createUser('user2', '123456789', 'Fay Mail', 'user2@example.com');
         $auth->createUser('user3', 'asdkfjdl', '', 'some@mail.com');
+        $this->struct_data = ['duedate' => '2023-04-10',
+                                 'assignees' => ['user1', 'user2'],
+                                 'status' => 'Ongoing'];
+        $this->event_data = ['id' => 'some:page',
+                             'file' => 'path/to/some/page.txt',
+                             'revertFrom' => false,
+                             'oldRevision' => 1000,
+                             'newRevision' => 2000,
+                             'newContent' => 'Some new text.',
+                             'oldContent' => 'Some old text.',
+                             'summary' => 'updated wording',
+                             'contentChanged' => true,
+                             'changeInfo' => '',
+                             'changeType' => DOKU_CHANGE_TYPE_EDIT,
+                             'sizechange' => 14,
+        ];
     }
 
     function testGetUserEmail() {
@@ -197,9 +213,25 @@ class utilities_simple_plugin_structtakss_test extends \DokuWikiTest {
         $this->assertEquals($expected, $allEmails);
     }
 
-    // function testGetOldData() {
-    // }
+    function testGetOldData() {
+        $data = $this->util->getOldData($this->event_data, $this->struct_data);
+        $this->assertEquals('Ongoing', $data['status']);
+        $this->assertEquals(
+            ['Arron Dom Person <adperson@example.com>', 'Fay Mail <user2@example.com>'],
+            $data['assignees']
+        );
+        $this->assertEquals('2023-04-10', $data['duedate']);
+        $this->assertEquals('Some old text.', $data['content']);
+    }
 
-    // function testGetNewData() {
-    // }
+    function testGetNewData() {
+        $data = $this->util->getNewData($this->event_data, $this->struct_data);
+        $this->assertEquals('Ongoing', $data['status']);
+        $this->assertEquals(
+            ['Arron Dom Person <adperson@example.com>', 'Fay Mail <user2@example.com>'],
+            $data['assignees']
+        );
+        $this->assertEquals('2023-04-10', $data['duedate']);
+        $this->assertEquals('Some new text.', $data['content']);
+    }
 }
