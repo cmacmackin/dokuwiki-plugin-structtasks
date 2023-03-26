@@ -8,6 +8,14 @@
 
 use dokuwiki\plugin\structtasks\meta\Utilities;
 
+use dokuwiki\plugin\structtasks\meta\AssignedNotifier;
+use dokuwiki\plugin\structtasks\meta\ClosedStatusNotifier;
+use dokuwiki\plugin\structtasks\meta\DateNotifier;
+use dokuwiki\plugin\structtasks\meta\DeletedNotifier;
+use dokuwiki\plugin\structtasks\meta\OpenStatusNotifier;
+use dokuwiki\plugin\structtasks\meta\RemovedNotifier;
+use dokuwiki\plugin\structtasks\meta\SelfRemovalNotifier;
+
 class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
 {
 
@@ -16,6 +24,17 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
     public function __constructor() {
         // Insantiate the Notifier objects
         $this->util = new Utilities();
+        $getConf = [$this, 'getConf'];
+        $getLang = [$this, 'getLang'];
+        $this->notifiers = [
+            new AssignedNotifier($getConf, $getLang),
+            new ClosedStatusNotifier($getConf, $getLang),
+            new DateNotifier($getConf, $getLang),
+            new DeletedNotifier($getConf, $getLang),
+            new OpenStatusNotifier($getConf, $getLang),
+            new RemovedNotifier($getConf, $getLang),
+            new SelfRemovalNotifier($getConf, $getLang),
+        ];
     }
     
     /** @inheritDoc */
@@ -35,40 +54,26 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
      */
     public function handle_common_wikipage_save(Doku_Event $event, $param)
     {
-        // Check if schema assigned to this page
-        $newMetaData = $struct->getData($event->id, $this->getConf('schema'), $event->newRevision);
-        // If no struct data assigned, then do nothing
-        if (count($newMetaData) == 0) {
-            return;
-        }
+        $struct = $this->loadHelper('struct', true);
+        if (is_null($struct)) return;
+        $util = new Utilities($struct);
 
-        $title = p_get_first_heading($event->id, METADATA_RENDER_USING_SIMPLE_CACHE);
-
-        // Fetch struct data from before and after the edit
-        // FIXME: Make sure to consider page creation; should basically make old metadata empty, but the helper plugin might not do that for me.
-
-        // Work out what changes have been made
-        $new_data = array(
-            'content' => '',
-            'duedate' => '',
-            'assignees' => [],
-            'status' => '',
+        $id = event->data['id'];
+        list($old_structdata, $new_structdata, $valid) = $util->getMetadata(
+            $id, $event->data['oldRevision'], $event->data['newRevision']
         );
-        $old_data = array();
-        
-        /* Send email to assignees that WEREN'T THE EDITOR if
-         *   - They have been newly assigned to task
-         *   - They have been removed from the task
-         *   - Someone else has removed THEMSELVES from the task
-         *   - The due date has changed
-         *   - The task status changes
-         *   - The task page is deleted
-         *   - Someone has updated the task?
-         */
+        if (!$valid) return;
 
-        // Subscribe new assignees to the page?
+        global $USERINFO;
+        $title = p_get_first_heading($id, METADATA_RENDER_USING_SIMPLE_CACHE);
+        $editor = $USERINFO['name'];
+        $editor_id = $INPUT->server->str('REMOTE_USER');
+        $editor_email = $util->getUserEmail($editor_id);
+        $new_data = $this->util->getNewData($event->data, $new_structdata);
+        $old_data = $this->util->getOldData($event->data, $old_structdata);
 
-        // Unsubscribe any assignees that have been removed?
+        foreach ($this->notifiers as $notifier) {
+            $notifier->sendMessage($id, $title, $editor, $editor_email, $new_data, $old_data);
+        }
     }
 }
-
