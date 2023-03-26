@@ -199,18 +199,10 @@ END,
             $html_replacements = [
                 'TITLELINK' => "<a href=\"${url}\">" . $this::page_title . '</a>'
             ];
-            $expected_subject = <<<END
-Check substitutions:
-{$text_replacements['TITLE']}
-{$text_replacements['TITLELINK']}
-{$text_replacements['EDITURL']}
-{$text_replacements['EDITOR']}
-{$text_replacements['STATUS']}
-{$text_replacements['PREVSTATUS']}
-{$text_replacements['DUEDATE']}
-{$text_replacements['PREVDUEDATE']}
-{$text_replacements['WIKINAME']}
-END;
+            $expected_subject = "Check substitutions:";
+            foreach($text_replacements as $t) {
+                $expected_subject .= "\n$t";
+            }
             $mailer->expects($this->once())
                    ->method('setBody')
                    ->with($this->equalTo($this::email_text),

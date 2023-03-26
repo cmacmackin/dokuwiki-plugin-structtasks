@@ -21,7 +21,6 @@ class DeletedNotifier extends AbstractNotifier
         $getConf = $this->getConf;
         $completed_pattern = $getConf('completed');
         $old_closed = preg_match($completed_pattern, $old_data['status']);
-        echo($old_closed);
         if (!$old_closed and $new_data['content'] == '') {
             return array_filter(
                 $old_data['assignees'],
