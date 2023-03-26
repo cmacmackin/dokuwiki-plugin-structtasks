@@ -1,0 +1,82 @@
+{
+    "structversion": "2022-07-04",
+    "schema": "badassignees",
+    "id": "70",
+    "user": "testuser",
+    "config": {
+        "allowed editors": "",
+        "label": {
+            "en": "Tasks"
+        }
+    },
+    "columns": [
+        {
+            "colref": 1,
+            "ismulti": false,
+            "isenabled": true,
+            "sort": 10,
+            "label": "duedate",
+            "class": "DateTime",
+            "config": {
+                "visibility": {
+                    "inpage": true,
+                    "ineditor": true
+                },
+                "format": "H:i, j M Y",
+                "prefilltoday": false,
+                "pastonly": false,
+                "futureonly": false,
+                "label": {
+                    "en": "Start Time"
+                },
+                "hint": {
+                    "en": ""
+                }
+            }
+        },
+        {
+            "colref": 2,
+            "ismulti": true,
+            "isenabled": true,
+            "sort": 20,
+            "label": "assignees",
+            "class": "Text",
+            "config": {
+                "visibility": {
+                    "inpage": true,
+                    "ineditor": true
+                },
+                "prefix": "",
+                "postfix": "",
+                "label": {
+                    "en": "Location"
+                },
+                "hint": {
+                    "en": ""
+                }
+            }
+        },
+        {
+            "colref": 3,
+            "ismulti": false,
+            "isenabled": true,
+            "sort": 30,
+            "label": "status",
+            "class": "Text",
+            "config": {
+                "visibility": {
+                    "inpage": true,
+                    "ineditor": true
+                },
+                "prefix": "",
+                "postfix": "",
+                "label": {
+                    "en": "Location"
+                },
+                "hint": {
+                    "en": ""
+                }
+            }
+        }
+    ]
+}

@@ -5,6 +5,9 @@
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Chris MacMackin <cmacmackin@gmail.com>
  */
+
+use dokuwiki\plugin\structtasks\meta\Utilities;
+
 class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
 {
 
@@ -12,6 +15,7 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
 
     public function __constructor() {
         // Insantiate the Notifier objects
+        $this->util = new Utilities();
     }
     
     /** @inheritDoc */
@@ -32,7 +36,6 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
     public function handle_common_wikipage_save(Doku_Event $event, $param)
     {
         // Check if schema assigned to this page
-        $struct = $this->loadHelper('struct', true);
         $newMetaData = $struct->getData($event->id, $this->getConf('schema'), $event->newRevision);
         // If no struct data assigned, then do nothing
         if (count($newMetaData) == 0) {
@@ -66,31 +69,6 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         // Subscribe new assignees to the page?
 
         // Unsubscribe any assignees that have been removed?
-    }
-
-    /**
-     * Return a string with the real name and email address of $user,
-     * suitable for using to send them an email.
-     */
-    static function getUserEmail($user) {
-        global $auth;
-        $userData = $auth->getUserData($user, false);
-        if ($userData === false) {
-            return false;
-        }
-        $realname = $userData['name'];
-        $email = $userData['mail'];
-        if ($realname === '') return $email;
-        if (strpos($userData['name'], ',')) $realname = '"' . $realname;
-        return "${realname} <${email}>";
-    }
-
-    /**
-     * Convert a list of usernames into a list of formatted email
-     * addresses.
-     */
-    static function assigneesToEmails($assignees) {
-        return array_filter(array_map([$this, 'getUserEmail'], $assignees), strlen);
     }
 }
 

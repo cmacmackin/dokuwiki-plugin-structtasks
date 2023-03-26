@@ -1,0 +1,83 @@
+{
+    "structversion": "2022-07-04",
+    "schema": "baddate",
+    "id": "10",
+    "user": "testuser",
+    "config": {
+        "allowed editors": "",
+        "label": {
+            "en": "Tasks"
+        }
+    },
+    "columns": [
+        {
+            "colref": 1,
+            "ismulti": false,
+            "isenabled": true,
+            "sort": 10,
+            "label": "duedate",
+            "class": "Text",
+            "config": {
+                "visibility": {
+                    "inpage": true,
+                    "ineditor": true
+                },
+                "prefix": "",
+                "postfix": "",
+                "label": {
+                    "en": "Location"
+                },
+                "hint": {
+                    "en": ""
+                }
+            }
+        },
+        {
+            "colref": 2,
+            "ismulti": true,
+            "isenabled": true,
+            "sort": 20,
+            "label": "assignees",
+            "class": "User",
+            "config": {
+                "visibility": {
+                    "inpage": true,
+                    "ineditor": true
+                },
+                "existingonly": true,
+                "autocomplete": {
+                    "fullname": true,
+                    "mininput": 2,
+                    "maxresult": 5
+                },
+                "label": {
+                    "en": "Assigned to"
+                },
+                "hint": {
+                    "en": ""
+                }
+            }
+        },
+        {
+            "colref": 3,
+            "ismulti": false,
+            "isenabled": true,
+            "sort": 30,
+            "label": "status",
+            "class": "Dropdown",
+            "config": {
+                "visibility": {
+                    "inpage": true,
+                    "ineditor": true
+                },
+                "values": "Ongoing, Completed, Cancelled",
+                "label": {
+                    "en": "Status"
+                },
+                "hint": {
+                    "en": ""
+                }
+            }
+        }
+    ]
+}
