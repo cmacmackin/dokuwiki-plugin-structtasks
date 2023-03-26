@@ -9,14 +9,25 @@
 
 namespace dokuwiki\plugin\structtasks\meta;
 
+use dokuwiki\plugin\struct\types\Date;
+use dokuwiki\plugin\struct\types\DateTime;
+use dokuwiki\plugin\struct\types\User;
+use dokuwiki\plugin\struct\types\Mail;
+use dokuwiki\plugin\struct\types\Dropdown;
+use dokuwiki\plugin\struct\types\Text;
 
 /**
  * Class with various useful static methods. 
  */
 class Utilities
 {
-    public function __constructor() {
-        $this->struct = $this->loadHelper('struct', true);
+    protected $struct;
+
+    /**
+     *  Pass in an instance of the struct_helper plugin when building this class;
+     */
+    public function __construct($helper) {
+        $this->struct = $helper;
     }
 
     
@@ -25,7 +36,35 @@ class Utilities
      * describing tasks.
      */
     function isValidSchema($schema) {
-        
+        $schemas_found = $this->struct->getSchema($schema);
+        $s = $schemas_found[$schema];
+        if ($s->getTimeStamp() == 0) {
+            msg("structtasks schema '${schema}' not found.", -1);
+            return false;
+        }
+        //var_dump($schemas_found);
+        $col_names = ['duedate', 'assignees', 'status'];
+        $col_types = [
+            'duedate' => [Date::class, DateTime::class],
+            'assignees' => [User::class, Mail::class],
+            'status' => [DropDown::class, Text::class]
+        ];
+        $columns = [];
+        $valid = true;
+        foreach ($col_types as $name => $types) {
+            $col = $s->findColumn($name);
+            if ($col === false) {
+                msg("structtasks schema '$schema' has no column '$name'.");
+                $valid = false;
+            } else {
+                $coltype = $col->getType()::class;
+                if (!in_array($coltype, $types)) {
+                    msg("Column '${name}' of structtasks schema '$schema' has invalid type ${coltype}");
+                    $valid = false;
+                }
+            }
+        }
+        return $valid;
     }
     
     /**

@@ -25,8 +25,8 @@ class utilities_plugin_structtasks_test extends DokuWikiTest {
      * Create some useful properties.
      */
     public function setUp(): void {
-        parent::tearDown();
-        $this->util = new Utilities();
+        parent::setUp();
+        $this->util = new Utilities(plugin_load('helper', 'struct'));
     }
 
     /**
@@ -38,7 +38,6 @@ class utilities_plugin_structtasks_test extends DokuWikiTest {
         /** @var \helper_plugin_struct_db $db */
         $db = plugin_load('helper', 'struct_db');
         $db->resetDB();
-        Assignments::reset();
     }
 
     /**
@@ -57,6 +56,7 @@ class utilities_plugin_structtasks_test extends DokuWikiTest {
             throw new \RuntimeException("$file does not exist");
         }
 
+        $json = file_get_contents($file);
         $importer = new SchemaImporter($schema, $json);
 
         if (!$importer->build($rev)) {
@@ -70,7 +70,7 @@ class utilities_plugin_structtasks_test extends DokuWikiTest {
 
     function invalidSchemas() {
         return [['badassignees'], ['baddate'], ['badstatus'],
-                ['missingassignees'], ['missingdate'], [',missingstatus']];
+                ['missingassignees'], ['missingdate'], ['missingstatus']];
     }
 
     /**
@@ -79,7 +79,7 @@ class utilities_plugin_structtasks_test extends DokuWikiTest {
     function testIsValidSchema($schema) {
         $this->assertFalse($this->util->isValidSchema($schema));
         $this->loadSchemaJSON($schema);
-        $this->asserTrue($this->util->isValidSchema($schema));
+        $this->assertTrue($this->util->isValidSchema($schema));
     }
 
     /**
@@ -88,7 +88,7 @@ class utilities_plugin_structtasks_test extends DokuWikiTest {
     function testIsInvalidSchema($schema) {
         $this->assertFalse($this->util->isValidSchema($schema));
         $this->loadSchemaJSON($schema);
-        $this->asserFalse($this->util->isValidSchema($schema));
+        $this->assertFalse($this->util->isValidSchema($schema));
     }
     
     function testGetMetadata() {

@@ -40,7 +40,7 @@
             "isenabled": true,
             "sort": 20,
             "label": "assignees",
-            "class": "Email",
+            "class": "Mail",
             "config": {
                 "visibility": {
                     "inpage": true,
