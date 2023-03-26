@@ -88,6 +88,8 @@ Brief description of the task.',
 
     public function provideNotifiers() {
         $all_but_editor = array_slice($this::new_data['assignees'], 0, -1);
+        $empty_data = ['content' => '', 'duedate' => '', 'assignees' => [],
+                       'status' => ''];
 
         return [
             'AssignedNotifier' => [
@@ -159,11 +161,23 @@ Brief description of the task.',
                 $this::old_data, 'deleted'
             ],
             'Not DeletedNotifier 2' => [
-                DeletedNotifier::class, [],
-                ['content' => '', 'duedate' => '', 'assignees' => [],
-                 'status' => ''],
-                $this::new_data,
-                'deleted'
+                DeletedNotifier::class, [], $empty_data, $this::new_data, 'deleted'
+            ],
+            'New page AssignedNotifier' => [
+                AssignedNotifier::class, $all_but_editor,
+                $this::new_data, $empty_data, 'assigned'
+            ],
+            'New page DateNotifier' => [
+                DateNotifier::class, [], $this::new_data,
+                $empty_data, 'date'
+            ],
+            'New page ClosedStatusNotifier' => [
+                ClosedStatusNotifier::class, [], $this::new_data,
+                $empty_data, 'closedstatus'
+            ],
+            'New page OpenStatusNotifier' => [
+                OpenStatusNotifier::class, [], $this::old_data,
+                $empty_data, 'openstatus'
             ],
         ];
     }

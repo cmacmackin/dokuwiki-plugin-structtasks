@@ -18,6 +18,8 @@ class DateNotifier extends AbstractNotifier
 {
     const lang_key_prefix = 'date';
     public function getNotifiableUsers($page, $editor, $new_data, $old_data) {
+        // Don't send emails for newly-created pages
+        if ($old_data['content'] === '' and $new_data['content'] !== '') return [];
         if ($new_data['duedate'] === $old_data['duedate']) return [];
         return array_filter(
             $new_data['assignees'],
