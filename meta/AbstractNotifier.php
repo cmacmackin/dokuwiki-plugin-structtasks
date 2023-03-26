@@ -57,12 +57,12 @@ abstract class AbstractNotifier
         $this->getLang = $getLang;
     }
 
-    abstract function getNotifiableUsers($page, $editor, $new_data, $old_data);
+    abstract function getNotifiableUsers($page, $editor_email, $new_data, $old_data);
 
-    public function sendMessage($page_id, $page_title, $editor, $new_data,
+    public function sendMessage($page_id, $page_title, $editor, $editor_email, $new_data,
                                 $old_data, $mailer = NULL) {
         if (is_null($mailer)) $mailer = new Mailer();
-        $notifiable_users = $this->getNotifiableUsers($page_id, $editor, $new_data, $old_data);
+        $notifiable_users = $this->getNotifiableUsers($page_id, $editor_email, $new_data, $old_data);
         if (count($notifiable_users) == 0) return;
         global $conf;
         $getLang = $this->getLang;

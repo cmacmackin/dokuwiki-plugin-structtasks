@@ -17,14 +17,14 @@ namespace dokuwiki\plugin\structtasks\meta;
 class DeletedNotifier extends AbstractNotifier
 {
     const lang_key_prefix = 'deleted';
-    public function getNotifiableUsers($page, $editor, $new_data, $old_data) {
+    public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
         $getConf = $this->getConf;
         $completed_pattern = $getConf('completed');
         $old_closed = preg_match($completed_pattern, $old_data['status']);
         if (!$old_closed and $new_data['content'] == '') {
             return array_filter(
                 $old_data['assignees'],
-                function ($val) use ($editor) {return $val !== $editor;}
+                function ($val) use ($editor_email) {return $val !== $editor_email;}
             );
         } else {
             return [];

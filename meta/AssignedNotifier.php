@@ -17,10 +17,10 @@ namespace dokuwiki\plugin\structtasks\meta;
 class AssignedNotifier extends AbstractNotifier
 {
     const lang_key_prefix = 'assigned';
-    public function getNotifiableUsers($page, $editor, $new_data, $old_data) {
+    public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
         return array_filter(
             array_diff($new_data['assignees'], $old_data['assignees']),
-            function ($val) use ($editor) {return $val !== $editor;}
+            function ($val) use ($editor_email) {return $val !== $editor_email;}
         );
     }
 }

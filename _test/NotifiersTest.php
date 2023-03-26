@@ -42,7 +42,8 @@ class notifiers_plugin_structtasks_test extends DokuWikiTest {
     const email_html = 'Formatted HTML to be sent as message body.';
     const page_id = 'some:page_id';
     const page_title = 'Task Title';
-    const editor = 'Some User <some.user@example.com>';
+    const editor = 'Some User';
+    const editor_email = 'Some User <some.user@example.com>';
     const new_data = [
         'content' => '====== Task Title ======
 Brief updated description of the task.',
@@ -232,6 +233,7 @@ Brief description of the task.',
             $this::page_id,
             $this::page_title,
             $this::editor,
+            $this::editor_email,
             $new_data,
             $old_data,
             $mailer
