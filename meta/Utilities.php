@@ -62,7 +62,7 @@ class Utilities
                 msg("structtasks schema '$schema' has no column '$name'.", -1);
                 $valid = false;
             } else {
-                $coltype = $col->getType()::class;
+                $coltype = get_class($col->getType());
                 if (!in_array($coltype, $types)) {
                     msg("Column '${name}' of structtasks schema '$schema' has invalid type ${coltype}", -1);
                     $valid = false;
