@@ -5,40 +5,17 @@ namespace dokuwiki\plugin\structtasks\test;
 use DokuWikiTest;
 
 use dokuwiki\plugin\struct\meta\SchemaImporter;
+use dokuwiki\plugin\struct\test\StructTest;
 use dokuwiki\plugin\structtasks\meta\Utilities;
 
-/**
- * Tests of the methods on the Utilities classes for the structtasks
- * plugin. These perform miscellaneous tasks related to processing
- * page and struct data.
- *
- * @group plugin_structtasks
- * @group plugins
- */
-
-class utilities_plugin_structtasks_test extends DokuWikiTest {
-
-    /** @var array alway enable the needed plugins */
-    protected $pluginsEnabled = array('struct', 'sqlite');
-
-    /**
+class StructtasksTest extends StructTest {
+   /**
      * Create some useful properties.
      */
     public function setUp(): void {
         parent::setUp();
         $this->util = new Utilities(plugin_load('helper', 'struct'));
-    }
-
-    /**
-     * Clear the struct database.
-     */
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        /** @var \helper_plugin_struct_db $db */
-        $db = plugin_load('helper', 'struct_db');
-        $db->resetDB();
-    }
+     }
 
     /**
      * Creates a schema from one of the available schema files
@@ -63,6 +40,17 @@ class utilities_plugin_structtasks_test extends DokuWikiTest {
             throw new \RuntimeException("build of $schema from $file failed");
         }
     }
+}
+
+
+/**
+ * Tests for Utilities::isValidSchema.
+ *
+ * @group plugin_structtasks
+ * @group plugins
+ */
+
+class utilities_isvalid_plugin_structtasks_test extends StructtasksTest {
 
     function validSchemas() {
         return [['valid'], ['valid2']];
@@ -70,7 +58,8 @@ class utilities_plugin_structtasks_test extends DokuWikiTest {
 
     function invalidSchemas() {
         return [['badassignees'], ['baddate'], ['badstatus'],
-                ['missingassignees'], ['missingdate'], ['missingstatus']];
+                ['missingassignees'], ['missingdate'], ['missingstatus'],
+                ['multidate'], ['multistatus']];
     }
 
     /**

@@ -36,30 +36,39 @@ class Utilities
      * describing tasks.
      */
     function isValidSchema($schema) {
+        if ($schema == '') return false;
         $schemas_found = $this->struct->getSchema($schema);
         $s = $schemas_found[$schema];
         if ($s->getTimeStamp() == 0) {
-            msg("structtasks schema '${schema}' not found.", -1);
+            msg("Schema '${schema}', needed for structtasks, does not exist.", -1);
             return false;
         }
-        //var_dump($schemas_found);
         $col_names = ['duedate', 'assignees', 'status'];
         $col_types = [
             'duedate' => [Date::class, DateTime::class],
             'assignees' => [User::class, Mail::class],
             'status' => [DropDown::class, Text::class]
         ];
+        $accepts_multi = [
+            'duedate' => false,
+            'assignees' => true,
+            'status' => false,
+        ];
         $columns = [];
         $valid = true;
         foreach ($col_types as $name => $types) {
             $col = $s->findColumn($name);
             if ($col === false) {
-                msg("structtasks schema '$schema' has no column '$name'.");
+                msg("structtasks schema '$schema' has no column '$name'.", -1);
                 $valid = false;
             } else {
                 $coltype = $col->getType()::class;
                 if (!in_array($coltype, $types)) {
-                    msg("Column '${name}' of structtasks schema '$schema' has invalid type ${coltype}");
+                    msg("Column '${name}' of structtasks schema '$schema' has invalid type ${coltype}", -1);
+                    $valid = false;
+                }
+                if ($accepts_multi[$name] xor $col->isMulti()) {
+                    msg("Column '${name}' of structtasks schema '$schema' must not accept multiple values; change the configurations", -1);
                     $valid = false;
                 }
             }
