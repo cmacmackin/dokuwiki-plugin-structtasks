@@ -5,27 +5,25 @@ namespace dokuwiki\plugin\structtasks\test;
 use DokuWikiTest;
 
 use dokuwiki\plugin\structtasks\meta\AssignedNotifier;
+use dokuwiki\plugin\structtasks\meta\ClosedStatusNotifier;
+use dokuwiki\plugin\structtasks\meta\DateNotifier;
+use dokuwiki\plugin\structtasks\meta\DeletedNotifier;
+use dokuwiki\plugin\structtasks\meta\OpenStatusNotifier;
+use dokuwiki\plugin\structtasks\meta\RemovedNotifier;
+use dokuwiki\plugin\structtasks\meta\SelfRemovalNotifier;
 
 
 /**
- * General tests for the structtasks plugin
+ * Tests of the "notifier" classes for the structtasks plugin. These
+ * examin the changes that have been made and will send out emails
+ * accordingly. Here, the mailer class is mocked so we can check it is
+ * being called correctly.
  *
  * @group plugin_structtasks
  * @group plugins
  */
 
 class notifiers_plugin_structtasks_test extends DokuWikiTest {
-    // Test each notifier. For each one, have some people that were
-    // added and removed in the edit and ensure they receive
-    // appropriate updates. For most of these I can reuse the same
-    // data. Probably just for testing open/close and deletion that I
-    // need something different.
-
-    // Use fake language function and conf function. Can double check
-    // substitutions work correctly in subject. Use a mock Mailer.
-
-    /** @var array alway enable the needed plugins */
-    //protected $pluginsEnabled = array('structtasks', 'struct', 'sqlite');
 
     const subject = <<<'END'
 Check substitutions:
@@ -70,60 +68,11 @@ END,
         'schema' => '',
         'reminder' => array('1', '0'),
         'overdue_reminder' => 1,
-        'completed' => '/^(completed?|closed|cancelled|finished)$/'
+        'completed' => '/^(completed?|closed|cancelled|finished)$/i'
     ];
 
-    public function initialize() {
-        $url = DOKU_URL . DOKU_SCRIPT . '?id=' . $this::page_id;
-        $this->text_replacements = [
-            'TITLE' => $this::page_title,
-            'TITLELINK' => $this::page_title . " <${url}>",
-            'EDITURL' => "${url}&do=edit",
-            'EDITOR' => $this::editor,
-            'STATUS' => $this::new_data['status'],
-            'PREVSTATUS' => $this::old_data['status'],
-            'DUEDATE' => $this::new_data['duedate'],
-            'PREVDUEDATE' => $this::old_data['duedate'],
-            'WIKINAME' => 'My Test Wiki',
-        ];
-        $this->html_replacements = [
-            'TITLELINK' => "<a href=\"${url}\">" . $this::page_title . '</a>'
-        ];
-        $this->expected_subject = <<<END
-Check substitutions:
-{$this->text_replacements['TITLE']}
-{$this->text_replacements['TITLELINK']}
-{$this->text_replacements['EDITURL']}
-{$this->text_replacements['EDITOR']}
-{$this->text_replacements['STATUS']}
-{$this->text_replacements['PREVSTATUS']}
-{$this->text_replacements['DUEDATE']}
-{$this->text_replacements['PREVDUEDATE']}
-{$this->text_replacements['WIKINAME']}
-END;
-    }
-
-    private function makeMockMailer($recipients) {
-        $calls = count($recipients);
-        $mailer = $this->createMock(\Mailer::class);
-        $mailer->expects($this->exactly($calls))
-               ->method('to')
-               ->withConsecutive(...array_chunk(array_map([$this, 'equalTo'], $recipients), 1));
-        $mailer->expects($this->exactly($calls))
-               ->method('subject')
-               ->with($this->equalTo($this->expected_subject));
-        $mailer->expects($this->once())
-               ->method('setBody')
-               ->with($this->equalTo($this::email_text),
-                      $this->equalTo($this->text_replacements),
-                      $this->equalTo($this->html_replacements),
-                      $this->equalTo($this::email_html));
-        $mailer->expects($this->exactly($calls))->method('send')->with();
-        return $mailer;
-    }
-
     static function fakeGetConf($key) {
-        return defaultSettings[$key];
+        return self::defaultSettings[$key];
     }
     
     private function getLangCallback($expected_key) {
@@ -144,24 +93,147 @@ END;
     }
 
     public function provideNotifiers() {
-        $this->initialize();
-        $assigned_mock_mailer = $this->makeMockMailer([$this::new_data['assignees'][0]]);
+        $all_but_editor = array_slice($this::new_data['assignees'], 0, -1);
+
         return [
-            [AssignedNotifier::class, $assigned_mock_mailer],
+            'AssignedNotifier' => [
+                AssignedNotifier::class, [$this::new_data['assignees'][0]],
+                $this::new_data, $this::old_data, 'assigned'
+            ],
+            'RemovedNotifier' => [
+                RemovedNotifier::class, [$this::old_data['assignees'][2]],
+                $this::new_data, $this::old_data, 'removed'
+            ],
+            'DateNotifier' => [
+                DateNotifier::class, $all_but_editor, $this::new_data,
+                $this::old_data, 'date'
+            ],
+            'OpenStatusNotifier' => [
+                OpenStatusNotifier::class, $all_but_editor,
+                array_replace($this::new_data, ['status' => 'Ongoing']),
+                array_replace($this::old_data, ['status' => 'Completed']),
+                'openstatus'
+            ],
+            'ClosedStatusNotifier' => [
+                ClosedStatusNotifier::class, $all_but_editor, $this::new_data,
+                $this::old_data, 'closedstatus'
+            ],
+            'SelfRemovalNotifier' => [
+                SelfRemovalNotifier::class, $all_but_editor,
+                array_replace($this::new_data, ['assignees' => $all_but_editor]),
+                $this::old_data, 'self_removal'
+            ],
+            'DeletedNotifier' => [
+                DeletedNotifier::class,
+                array_slice($this::old_data['assignees'], 0, -1),
+                ['content' => '', 'duedate' => '', 'assignees' => [], 'status' => ''],
+                $this::old_data,
+                'deleted'
+            ],
+            'Not AssignedNotifier' => [
+                AssignedNotifier::class, [], $this::new_data,
+                $this::new_data, 'assigned'
+            ],
+            'Not RemovedNotifier' => [
+                RemovedNotifier::class, [], $this::new_data,
+                $this::new_data, 'removed'
+            ],
+            'Not DateNotifier' => [
+                DateNotifier::class, [], $this::new_data,
+                $this::new_data, 'date'
+            ],
+            'Not ClosedStatusNotifier' => [
+                ClosedStatusNotifier::class, [], $this::new_data,
+                $this::new_data, 'closedstatus'
+            ],
+            'Not OpenStatusNotifier' => [
+                OpenStatusNotifier::class, [], $this::old_data,
+                $this::old_data, 'openstatus'
+            ],
+            'Not SelfRemovalNotifier' => [
+                SelfRemovalNotifier::class, [], $this::old_data,
+                $this::new_data, 'self_removal'
+            ],
+            'Not SelfRemovalNotifier 2' => [
+                SelfRemovalNotifier::class, [],
+                array_replace($this::old_data, ['assignees' => $all_but_editor]),
+                array_replace($this::new_data, ['assignees' => $all_but_editor]),
+                'self_removal'
+            ],
+            'Not DeletedNotifier' => [
+                SelfRemovalNotifier::class, [], $this::new_data,
+                $this::old_data, 'deleted'
+            ],
+            'Not DeletedNotifier 2' => [
+                DeletedNotifier::class, [],
+                ['content' => '', 'duedate' => '', 'assignees' => [],
+                 'status' => ''],
+                $this::new_data,
+                'deleted'
+            ],
         ];
     }
 
     /**
      * @dataProvider provideNotifiers
      */
-    public function testNotifiers($notifier, $mailer) {
-        $n = new $notifier([$this, 'fakeGetConf'], $this->getLangCallback('assigned'));
+    public function testNotifiers($notifier, $recipients, $new_data, $old_data, $key) {
+        $calls = count($recipients);
+        $mailer = $this->createMock(\Mailer::class);
+        $mailer->expects($this->exactly($calls))
+               ->method('to')
+               ->withConsecutive(...array_chunk(array_map([$this, 'equalTo'], $recipients), 1));
+        if ($calls > 0) {
+            $url = DOKU_URL . DOKU_SCRIPT . '?id=' . $this::page_id;
+            $text_replacements = [
+                'TITLE' => $this::page_title,
+                'TITLELINK' => $this::page_title . " <${url}>",
+                'EDITURL' => "${url}&do=edit",
+                'EDITOR' => $this::editor,
+                'STATUS' => $new_data['status'],
+                'PREVSTATUS' => $old_data['status'],
+                'DUEDATE' => $new_data['duedate'],
+                'PREVDUEDATE' => $old_data['duedate'],
+                'WIKINAME' => 'My Test Wiki',
+            ];
+            $html_replacements = [
+                'TITLELINK' => "<a href=\"${url}\">" . $this::page_title . '</a>'
+            ];
+            $expected_subject = <<<END
+Check substitutions:
+{$text_replacements['TITLE']}
+{$text_replacements['TITLELINK']}
+{$text_replacements['EDITURL']}
+{$text_replacements['EDITOR']}
+{$text_replacements['STATUS']}
+{$text_replacements['PREVSTATUS']}
+{$text_replacements['DUEDATE']}
+{$text_replacements['PREVDUEDATE']}
+{$text_replacements['WIKINAME']}
+END;
+            $mailer->expects($this->once())
+                   ->method('setBody')
+                   ->with($this->equalTo($this::email_text),
+                          $this->equalTo($text_replacements),
+                          $this->equalTo($html_replacements),
+                          $this->equalTo($this::email_html));
+            $mailer->expects($this->exactly($calls))
+                   ->method('subject')
+                   ->with($this->equalTo($expected_subject));
+        } else {
+            $mailer->expects($this->never())
+                   ->method('setBody');
+            $mailer->expects($this->never())
+                   ->method('subject');
+        }
+        $mailer->expects($this->exactly($calls))->method('send')->with();
+        $n = new $notifier([$this, 'fakeGetConf'], $this->getLangCallback($key));
         $n->sendMessage(
             $this::page_id,
             $this::page_title,
             $this::editor,
-            $this::new_data,
-            $this::old_data,
+            $new_data,
+            $old_data,
             $mailer
         );
     }

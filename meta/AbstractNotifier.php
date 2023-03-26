@@ -61,6 +61,8 @@ abstract class AbstractNotifier
 
     public function sendMessage($page_id, $page_title, $editor, $new_data,
                                 $old_data, $mailer = new Mailer()) {
+        $notifiable_users = $this->getNotifiableUsers($page_id, $editor, $new_data, $old_data);
+        if (count($notifiable_users) == 0) return;
         global $conf;
         $getLang = $this->getLang;
         $url = wl($page_id, [], true);
@@ -83,8 +85,7 @@ abstract class AbstractNotifier
         $mailer->setBody($getLang($this::lang_key_prefix . '_text'),
                          $text_subs, $html_subs,
                          $getLang($this::lang_key_prefix . '_html'));
-        foreach ($this->getNotifiableUsers($page_id, $editor, $new_data, $old_data)
-                 as $user) {
+        foreach ($notifiable_users as $user) {
             $mailer->to($user);
             $mailer->subject($subject);
             $mailer->send();
