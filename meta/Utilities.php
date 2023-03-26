@@ -82,6 +82,17 @@ class Utilities
      * valid task for which notifications could be sent.
      */
     function getMetadata($id, $old_rev, $new_rev) {
+        global $conf;
+        $schema = $conf['plugin']['structtasks']['schema'];
+        if (!$this::isValidSchema($schema)) {
+            return [NULL, NULL, false];
+        }
+        $old_data = $this->struct->getData($id, null, $old_rev);
+        $new_data = $this->struct->getData($id, null, $new_rev);
+        if (!array_key_exists($schema, $old_data) or !array_key_exists($schema, $new_data)) {
+            return [NULL, NULL, false];
+        }   
+        return [$old_data[$schema], $new_data[$schema], true];
     }
     
     /**
@@ -92,7 +103,11 @@ class Utilities
         global $auth;
         $userData = $auth->getUserData($user, false);
         if ($userData === false) {
-            return false;
+            if (preg_match('/\w+@\w+\.\w+/', $user)) {
+                return $user;
+            } else {
+                return '';
+            }
         }
         $realname = $userData['name'];
         $email = $userData['mail'];
@@ -106,7 +121,7 @@ class Utilities
      * addresses.
      */
     function assigneesToEmails($assignees) {
-        return array_filter(array_map([$this, 'getUserEmail'], $assignees), strlen);
+        return array_values(array_filter(array_map([$this, 'getUserEmail'], $assignees)));
     }
 
     /**
