@@ -3,44 +3,7 @@
 namespace dokuwiki\plugin\structtasks\test;
 
 use DokuWikiTest;
-
-use dokuwiki\plugin\struct\meta\SchemaImporter;
-use dokuwiki\plugin\struct\test\StructTest;
 use dokuwiki\plugin\structtasks\meta\Utilities;
-
-class StructtasksTest extends StructTest {
-   /**
-     * Create some useful properties.
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->util = new Utilities(plugin_load('helper', 'struct'));
-     }
-
-    /**
-     * Creates a schema from one of the available schema files
-     *
-     * @param string $schema
-     * @param string $json base name of the JSON file optional, defaults to $schema
-     * @param int $rev allows to create schemas back in time
-     * @param bool $lookup create as a lookup schema
-     */
-    protected function loadSchemaJSON($schema, $json = '', $rev = 0)
-    {
-        if (!$json) $json = $schema;
-        $file = __DIR__ . "/json/$json.struct.json";
-        if (!file_exists($file)) {
-            throw new \RuntimeException("$file does not exist");
-        }
-
-        $json = file_get_contents($file);
-        $importer = new SchemaImporter($schema, $json);
-
-        if (!$importer->build($rev)) {
-            throw new \RuntimeException("build of $schema from $file failed");
-        }
-    }
-}
 
 
 /**
@@ -51,6 +14,13 @@ class StructtasksTest extends StructTest {
  */
 
 class utilities_isvalid_plugin_structtasks_test extends StructtasksTest {
+    /**
+     * Create some useful properties.
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->util = new Utilities(plugin_load('helper', 'struct'));
+    }
 
     function validSchemas() {
         return [['valid'], ['valid2']];
@@ -94,6 +64,7 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
         parent::setUp();
         global $auth;
         global $conf;
+        $this->util = new Utilities(plugin_load('helper', 'struct'));
         $conf['plugin']['structtasks']['schema'] = 'valid';
         $auth->createUser('user1', 'abcdefg', 'Arron Dom Person', 'adperson@example.com');
         $auth->createUser('user2', '123456789', 'Fay Mail', 'user2@example.com');
@@ -211,6 +182,9 @@ class utilities_simple_plugin_structtakss_test extends \DokuWikiTest {
                      'user2@example.com',
         ];
         $this->assertEquals($expected, $allEmails);
+
+        $this->assertEquals(['Fay Mail <user2@example.com>'],
+                            $this->util->assigneesToEmails('user2'));
     }
 
     function testGetOldData() {
