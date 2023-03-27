@@ -75,7 +75,7 @@ class action_plugin_structtasks_test extends StructtasksTest {
                         $this->equalTo('Arron Dom Person'),
                         $this->equalTo('Arron Dom Person <adperson@example.com>'),
                         $this->equalTo($expected_new_data),
-                        $this->equalTo($expected_old_data),
+                        $this->equalTo($expected_old_data)
                  );
         $action->notifiers = [$notifier];
 
