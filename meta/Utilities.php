@@ -30,7 +30,6 @@ class Utilities
         $this->struct = $helper;
     }
 
-    
     /**
      * Tests whether the specified schema meets the requirements for
      * describing tasks.
@@ -121,6 +120,9 @@ class Utilities
      * addresses.
      */
     function assigneesToEmails($assignees) {
+        if (!is_array($assignees)) {
+            $assignees = [$assignees];
+        }
         return array_values(array_filter(array_map([$this, 'getUserEmail'], $assignees)));
     }
 
