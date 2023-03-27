@@ -19,7 +19,7 @@ use dokuwiki\plugin\structtasks\meta\SelfRemovalNotifier;
 class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
 {
 
-    private $notifiers = array();
+    public $notifiers = array();
 
     public function __constructor() {
         // Insantiate the Notifier objects
@@ -58,22 +58,25 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         if (is_null($struct)) return;
         $util = new Utilities($struct);
 
-        $id = event->data['id'];
+        $id = $event->data['id'];
         list($old_structdata, $new_structdata, $valid) = $util->getMetadata(
             $id, $event->data['oldRevision'], $event->data['newRevision']
         );
         if (!$valid) return;
 
-        global $USERINFO;
+        global $INPUT;
+        global $auth;
         $title = p_get_first_heading($id, METADATA_RENDER_USING_SIMPLE_CACHE);
-        $editor = $USERINFO['name'];
         $editor_id = $INPUT->server->str('REMOTE_USER');
+        $userData = $auth->getUserData($editor_id, false);
+        $editor_name = ($userData !== false and $userData['name'] !== '') ?
+                     $userData['name'] : $editor_id;
         $editor_email = $util->getUserEmail($editor_id);
-        $new_data = $this->util->getNewData($event->data, $new_structdata);
-        $old_data = $this->util->getOldData($event->data, $old_structdata);
+        $new_data = $util->getNewData($event->data, $new_structdata);
+        $old_data = $util->getOldData($event->data, $old_structdata);
 
         foreach ($this->notifiers as $notifier) {
-            $notifier->sendMessage($id, $title, $editor, $editor_email, $new_data, $old_data);
+            $notifier->sendMessage($id, $title, $editor_name, $editor_email, $new_data, $old_data);
         }
     }
 }
