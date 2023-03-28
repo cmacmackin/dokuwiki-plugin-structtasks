@@ -63,9 +63,7 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
     public function setUp(): void {
         parent::setUp();
         global $auth;
-        global $conf;
         $this->util = new Utilities(plugin_load('helper', 'struct'));
-        $conf['plugin']['structtasks']['schema'] = 'valid';
         $auth->createUser('user1', 'abcdefg', 'Arron Dom Person', 'adperson@example.com');
         $auth->createUser('user2', '123456789', 'Fay Mail', 'user2@example.com');
         
@@ -89,7 +87,7 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
      }
 
     function testGetMetadata() {
-        list($old_data, $new_data, $valid) = $this->util->getMetadata('some:page', $this->rev1, $this->rev2);
+        list($old_data, $new_data, $valid) = $this->util->getMetadata('some:page', 'valid', $this->rev1, $this->rev2);
         $this->assertTrue($valid);
         foreach ($this->old_metadata as $key => $val) {
             $this->assertEquals($old_data[$key], $val);
@@ -113,9 +111,7 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
      * @dataProvider invalidMetadataProvider
      */
     function testGetMetadataInvalid($page, $schema) {
-        global $conf;
-        $conf['plugin']['structtasks']['schema'] = $schema;
-        list($old_data, $new_data, $valid) = $this->util->getMetadata($page, $this->rev1, $this->rev2);
+        list($old_data, $new_data, $valid) = $this->util->getMetadata($page, $schema, $this->rev1, $this->rev2);
         $this->assertNull($old_data);
         $this->assertNull($new_data);
         $this->assertFalse($valid);

@@ -35,7 +35,6 @@ class Utilities
      * describing tasks.
      */
     function isValidSchema($schema) {
-        if ($schema == '') return false;
         $schemas_found = $this->struct->getSchema($schema);
         $s = $schemas_found[$schema];
         if ($s->getTimeStamp() == 0) {
@@ -80,9 +79,7 @@ class Utilities
      * event. Also returns a flag indicating if this page is even a
      * valid task for which notifications could be sent.
      */
-    function getMetadata($id, $old_rev, $new_rev) {
-        global $conf;
-        $schema = $conf['plugin']['structtasks']['schema'];
+    function getMetadata($id, $schema, $old_rev, $new_rev) {
         if (!$this::isValidSchema($schema)) {
             return [NULL, NULL, false];
         }
@@ -102,7 +99,7 @@ class Utilities
         global $auth;
         $userData = $auth->getUserData($user, false);
         if ($userData === false) {
-            if (preg_match('/\w+@\w+\.\w+/', $user)) {
+            if (mail_isvalid($user)) {
                 return $user;
             } else {
                 return '';

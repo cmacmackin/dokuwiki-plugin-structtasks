@@ -54,13 +54,16 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
      */
     public function handle_common_wikipage_save(Doku_Event $event, $param)
     {
+        global $conf;
+        $schema = $conf['plugin']['structtasks']['schema'];
+        if ($schema == '') return false;
         $struct = $this->loadHelper('struct', true);
         if (is_null($struct)) return;
         $util = new Utilities($struct);
 
         $id = $event->data['id'];
         list($old_structdata, $new_structdata, $valid) = $util->getMetadata(
-            $id, $event->data['oldRevision'], $event->data['newRevision']
+            $id, $schema, $event->data['oldRevision'], $event->data['newRevision']
         );
         if (!$valid) return;
 
