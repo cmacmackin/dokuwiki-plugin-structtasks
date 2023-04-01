@@ -20,6 +20,7 @@ class TodayNotifier extends AbstractNotifier
 
     public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
         if (is_null($new_data['duedate'])) return [];
+        if ($this->isCompleted($new_data['status'])) return [];
         $time_remaining = $this->timeFromLastMidnight($new_data['duedate']);
         $days = $time_remaining[0] * 365 + $time_remaining[1] * 31 + $time_remaining[2];
         if ($days == 0) {

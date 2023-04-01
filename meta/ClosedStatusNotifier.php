@@ -20,10 +20,8 @@ class ClosedStatusNotifier extends AbstractNotifier
     public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
         // Don't send emails for newly-created pages
         if ($old_data['content'] === '' and $new_data['content'] !== '') return [];
-        $getConf = $this->getConf;
-        $completed_pattern = $getConf('completed');
-        $new_closed = preg_match($completed_pattern, $new_data['status']);
-        $old_closed = preg_match($completed_pattern, $old_data['status']);
+        $new_closed = $this->isCompleted($new_data['status']);
+        $old_closed = $this->isCompleted($old_data['status']);
         if (!$new_closed or $old_closed) return [];
         return array_filter(
             $new_data['assignees'],

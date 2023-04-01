@@ -18,9 +18,7 @@ class DeletedNotifier extends AbstractNotifier
 {
     const lang_key_prefix = 'deleted';
     public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
-        $getConf = $this->getConf;
-        $completed_pattern = $getConf('completed');
-        $old_closed = preg_match($completed_pattern, $old_data['status']);
+        $old_closed = $this->isCompleted($old_data['status']);
         if (!$old_closed and $new_data['content'] == '') {
             return array_filter(
                 $old_data['assignees'],

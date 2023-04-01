@@ -33,6 +33,7 @@ class ReminderNotifier extends AbstractNotifier
 
     public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
         if (is_null($new_data['duedate'])) return [];
+        if ($this->isCompleted($new_data['status'])) return [];
         // FIXME: if $days_before is more than one month then this
         // won't be very accurate
         $time_remaining = $this->timeFromLastMidnight($new_data['duedate']);

@@ -214,51 +214,65 @@ Brief description of the task.',
                 $empty_data, 'openstatus'
             ],
             'ReminderNotifier' => [
-                ReminderNotifier::class, $new_data['assignees'],
+                ReminderNotifier::class, $old_data['assignees'],
+                array_replace($old_data, ['duedate' => $tomorrow]),
+                array_replace($old_data, ['duedate' => $tomorrow]),
+                'reminder'
+            ],
+            'Closed ReminderNotifier' => [
+                ReminderNotifier::class, [],
                 array_replace($new_data, ['duedate' => $tomorrow]),
                 array_replace($new_data, ['duedate' => $tomorrow]),
                 'reminder'
             ],
             'Not ReminderNotifier' => [
-                ReminderNotifier::class, [], $new_data, $new_data,
+                ReminderNotifier::class, [], $old_data, $old_data,
                 'reminder'
             ],
             'No Date ReminderNotifier' => [
                 ReminderNotifier::class, [],
-                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
-                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
+                array_replace($old_data, ['duedate' => null, 'duedate_formatted' => '']),
+                array_replace($old_data, ['duedate' => null, 'duedate_formatted' => '']),
                 'reminder'
             ],
             'TodayNotifier' => [
-                TodayNotifier::class, $new_data['assignees'],
+                TodayNotifier::class, $old_data['assignees'],
+                array_replace($old_data, ['duedate' => $today]),
+                array_replace($old_data, ['duedate' => $today]),
+                'today'
+            ],            
+            'Closed TodayNotifier' => [
+                TodayNotifier::class, [],
                 array_replace($new_data, ['duedate' => $today]),
                 array_replace($new_data, ['duedate' => $today]),
                 'today'
             ],            
             'Not TodayNotifier' => [
-                TodayNotifier::class, [], $new_data, $new_data,
-                'today'
+                TodayNotifier::class, [], $old_data, $old_data, 'today'
             ],
             'No Date TodayNotifier' => [
                 TodayNotifier::class, [],
-                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
-                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
+                array_replace($old_data, ['duedate' => null, 'duedate_formatted' => '']),
+                array_replace($old_data, ['duedate' => null, 'duedate_formatted' => '']),
                 'today'
             ],
             'OverdueNotifier' => [
-                OverdueNotifier::class, $new_data['assignees'], $new_data,
-                $new_data, 'overdue'
+                OverdueNotifier::class, $old_data['assignees'], $old_data,
+                $old_data, 'overdue'
+            ],
+            'Closed OverdueNotifier' => [
+                OverdueNotifier::class, [], $new_data, $new_data, 'overdue'
             ],
             'Not OverdueNotifier' => [
                 OverdueNotifier::class, [],
-                array_replace($new_data, ['duedate' => $tomorrow]),
-                array_replace($new_data, ['duedate' => $tomorrow]),
+                array_replace($old_data, ['duedate' => $tomorrow]),
+                array_replace($old_data, ['duedate' => $tomorrow]),
                 'overdue'
             ],
             'No Date OverdueNotifier' => [
                 OverdueNotifier::class, [],
-                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
-                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
+                array_replace($old_data, ['duedate' => null, 'duedate_formatted' => '']),
+                array_replace($old_data, ['duedate' => null, 'duedate_formatted' => '']),
                 'overdue'
             ],
         ];

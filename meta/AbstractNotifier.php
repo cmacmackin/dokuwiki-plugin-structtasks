@@ -114,6 +114,16 @@ abstract class AbstractNotifier
     }
 
     /**
+     * Returns true if the regular expression for closed tasks matches
+     * $status.
+     */
+    function isCompleted($status) {
+        $getConf = $this->getConf;
+        $completed_pattern = $getConf('completed');
+        return preg_match($completed_pattern, $status);
+    }
+    
+    /**
      * (Possibly) send a message for revisions to the given page, if
      * necessary. $old_data and $new_data are associative arrays with
      * the following keys:
