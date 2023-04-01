@@ -92,9 +92,11 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
         foreach ($this->old_metadata as $key => $val) {
             $this->assertEquals($old_data[$key], $val);
         }
+        $this->assertEquals('j M Y', $old_data['date_format']);
         foreach ($this->new_metadata as $key => $val) {
             $this->assertEquals($new_data[$key], $val);
         }
+        $this->assertEquals('j M Y', $new_data['date_format']);
     }
 
     function invalidMetadataProvider() {
@@ -136,8 +138,9 @@ class utilities_simple_plugin_structtakss_test extends \DokuWikiTest {
         $auth->createUser('user2', '123456789', 'Fay Mail', 'user2@example.com');
         $auth->createUser('user3', 'asdkfjdl', '', 'some@mail.com');
         $this->struct_data = ['duedate' => '2023-04-10',
-                                 'assignees' => ['user1', 'user2'],
-                                 'status' => 'Ongoing'];
+                              'assignees' => ['user1', 'user2'],
+                              'status' => 'Ongoing',
+                              'date_format' => 'j M Y'];
         $this->event_data = ['id' => 'some:page',
                              'file' => 'path/to/some/page.txt',
                              'revertFrom' => false,
@@ -190,8 +193,9 @@ class utilities_simple_plugin_structtakss_test extends \DokuWikiTest {
             ['Arron Dom Person <adperson@example.com>', 'Fay Mail <user2@example.com>'],
             $data['assignees']
         );
-        $this->assertEquals('2023-04-10', $data['duedate']);
+        $this->assertEquals(date_create('2023-04-10'), $data['duedate']);
         $this->assertEquals('Some old text.', $data['content']);
+        $this->assertEquals('10 Apr 2023', $data['duedate_formatted']);
     }
 
     function testGetNewData() {
@@ -201,7 +205,8 @@ class utilities_simple_plugin_structtakss_test extends \DokuWikiTest {
             ['Arron Dom Person <adperson@example.com>', 'Fay Mail <user2@example.com>'],
             $data['assignees']
         );
-        $this->assertEquals('2023-04-10', $data['duedate']);
+        $this->assertEquals(date_create('2023-04-10'), $data['duedate']);
         $this->assertEquals('Some new text.', $data['content']);
+        $this->assertEquals('10 Apr 2023', $data['duedate_formatted']);
     }
 }

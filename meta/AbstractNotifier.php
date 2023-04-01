@@ -39,7 +39,10 @@ abstract class AbstractNotifier
      *   - @DUEDATE@
      *   - @PREVDUEDATE@
      *   - @WIKINAME@
+     *   - @DUEIN@
      *
+     * Note: DUEIN is the number of days before the task is due or the
+     * number of days elapsed since the due-date.
      */
     const lang_key_prefix = 'DUMMY';
 
@@ -59,6 +62,64 @@ abstract class AbstractNotifier
 
     abstract function getNotifiableUsers($page, $editor_email, $new_data, $old_data);
 
+    static protected function timeFromLastMidnight($date) {
+        $today = date_create();
+        $today->setTime(0, 0);
+        $date->setTime(0, 0);
+        $diff = $date->diff($today);
+        return [$diff->y, $diff->m, $diff->d];
+    }
+    
+    /**
+     * Works out how many days until the due-date (or since the
+     * due-date, as appropriate) and returns it in a nicely-formatted
+     * string.
+     */
+    static function dueIn($duedate) {
+        list($y, $m, $d) = self::timeFromLastMidnight($duedate);
+        $components = [];
+        if ($y != 0) {
+            $val = "{$y} year";
+            if (abs($y) > 1) $val .= 's';
+            $components[] = $val;
+        }
+        if ($m != 0) {
+            $val = "{$m} month";
+            if (abs($m) > 1) $val .= 's';
+            $components[] = $val;
+        }
+        if ($d != 0) {
+            $val = "{$d} day";
+            if (abs($d) > 1) $val .= 's';
+            $components[] = $val;
+        }
+        switch (count($components)) {
+        case 0:
+            return '0 days';
+        case 1:
+            return $components[0];
+        case 2:
+            return $components[0] . ' and ' . $components[1];
+        case 3:
+            return $components[0] . ', ' . $components[1] . ', and ' . $components[2];
+        default:
+            throw new Exception("Invalid number of date components");
+        }
+    }
+
+    /**
+     * (Possibly) send a message for revisions to the given page, if
+     * necessary. $old_data and $new_data are associative arrays with
+     * the following keys:
+     *
+     *    - content: The page content.
+     *    - duedate: A DateTime object specifying when the task is due.
+     *    - duedate_formatted: A string with the due-date formatted
+     *      according to the struct schema
+     *    - assignees: An array of email addresses for the people this
+     *      task has been assigned to.
+     *    - status: The completion status of the task.
+     */
     public function sendMessage($page_id, $page_title, $editor, $editor_email, $new_data,
                                 $old_data, $mailer = NULL) {
         if (is_null($mailer)) $mailer = new Mailer();
@@ -74,9 +135,10 @@ abstract class AbstractNotifier
             'EDITOR' => $editor,
             'STATUS' => $new_data['status'],
             'PREVSTATUS' => $old_data['status'],
-            'DUEDATE' => $new_data['duedate'],
-            'PREVDUEDATE' => $old_data['duedate'],
+            'DUEDATE' => $new_data['duedate_formatted'],
+            'PREVDUEDATE' => $old_data['duedate_formatted'],
             'WIKINAME' => $conf['title'],
+            'DUEIN' => $this->dueIn($new_data['duedate']),
         ];
         $html_subs = ['TITLELINK' => "<a href=\"${url}\">${page_title}</a>"];
         $subject = str_replace(

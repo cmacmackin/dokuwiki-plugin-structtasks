@@ -11,9 +11,9 @@ namespace dokuwiki\plugin\structtasks\meta;
 
 use dokuwiki\plugin\struct\types\Date;
 use dokuwiki\plugin\struct\types\DateTime;
+use dokuwiki\plugin\struct\types\Dropdown;
 use dokuwiki\plugin\struct\types\User;
 use dokuwiki\plugin\struct\types\Mail;
-use dokuwiki\plugin\struct\types\Dropdown;
 use dokuwiki\plugin\struct\types\Text;
 
 /**
@@ -22,19 +22,25 @@ use dokuwiki\plugin\struct\types\Text;
 class Utilities
 {
     protected $struct;
+    /// Date-time formata for the due-date, extracted from the
+    /// most-recently validated schema and cached here.
+    protected $duedate_format;
 
     /**
      *  Pass in an instance of the struct_helper plugin when building this class;
+     * @param mixed $helper
      */
-    public function __construct($helper) {
+    public function __construct(private $helper) {
         $this->struct = $helper;
     }
 
     /**
      * Tests whether the specified schema meets the requirements for
      * describing tasks.
+     * @return bool
+     * @param mixed $schema
      */
-    function isValidSchema($schema) {
+    function isValidSchema($schema): bool {
         $schemas_found = $this->struct->getSchema($schema);
         $s = $schemas_found[$schema];
         if ($s->getTimeStamp() == 0) {
@@ -45,7 +51,7 @@ class Utilities
         $col_types = [
             'duedate' => [Date::class, DateTime::class],
             'assignees' => [User::class, Mail::class],
-            'status' => [DropDown::class, Text::class]
+            'status' => [Dropdown::class, Text::class]
         ];
         $accepts_multi = [
             'duedate' => false,
@@ -71,6 +77,7 @@ class Utilities
                 }
             }
         }
+        if ($valid) $this->duedate_format = $s->findColumn('duedate')->getType()->getConfig()['format'];
         return $valid;
     }
     
@@ -87,10 +94,12 @@ class Utilities
         $new_data = $this->struct->getData($id, null, $new_rev);
         if (!array_key_exists($schema, $old_data) or !array_key_exists($schema, $new_data)) {
             return [NULL, NULL, false];
-        }   
+        }
+        $old_data[$schema]['date_format'] = $this->duedate_format;
+        $new_data[$schema]['date_format'] = $this->duedate_format;
         return [$old_data[$schema], $new_data[$schema], true];
     }
-    
+
     /**
      * Return a string with the real name and email address of $user,
      * suitable for using to send them an email.
@@ -126,11 +135,16 @@ class Utilities
     /**
      * Creates the $old_data array to be passed to
      * AbstractNotifier::sendMessage
+     * @return array
+     * @param mixed $eventdata
+     * @param mixed $structdata
      */
-    function getOldData($eventdata, $structdata) {
+    function getOldData($eventdata, $structdata): array {
+        $d = date_create($structdata['duedate']);
         return [
             'content' => $eventdata['oldContent'],
-            'duedate' => $structdata['duedate'],
+            'duedate' => $d,
+            'duedate_formatted' => $d->format($structdata['date_format']),
             'assignees' => $this->assigneesToEmails($structdata['assignees']),
             'status' => $structdata['status'],
         ];
@@ -139,11 +153,16 @@ class Utilities
     /**
      * Creates the $new_data array to be passed to
      * AbstractNotifier::sendMessage
+     * @return array
+     * @param mixed $eventdata
+     * @param mixed $structdata
      */
-    function getNewData($eventdata, $structdata) {
+    function getNewData($eventdata, $structdata): array {
+        $d = date_create($structdata['duedate']);
         return [
             'content' => $eventdata['newContent'],
-            'duedate' => $structdata['duedate'],
+            'duedate' => $d,
+            'duedate_formatted' => $d->format($structdata['date_format']),
             'assignees' => $this->assigneesToEmails($structdata['assignees']),
             'status' => $structdata['status'],
         ];

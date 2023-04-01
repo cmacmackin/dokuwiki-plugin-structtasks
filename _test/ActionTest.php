@@ -59,12 +59,21 @@ class action_plugin_structtasks_test extends StructtasksTest {
                      'assignees' => ['user1', 'user2'],
                      'status' => 'Ongoing'];
         $expected_old_data = $old_data;
-        $expected_old_data['assignees'] = ['Arron Dom Person <adperson@example.com>'];
-        $expected_old_data['content'] = $old_content;
-        $expected_new_data = $new_data;
-        $expected_new_data['assignees'] = ['Arron Dom Person <adperson@example.com>',
-                                           'Fay Mail <user2@example.com>'];
-        $expected_new_data['content'] = $new_content;
+        $expected_old_data =[
+            'duedate' => date_create($old_data['duedate']),
+            'assignees' => ['Arron Dom Person <adperson@example.com>'],
+            'status' => $old_data['status'],
+            'content' => $old_content,
+            'duedate_formatted' => '27 Mar 2023',
+        ];
+        $expected_new_data = [
+            'duedate' => date_create($new_data['duedate']),
+            'assignees' => ['Arron Dom Person <adperson@example.com>',
+                            'Fay Mail <user2@example.com>'],
+            'status' => $new_data['status'],
+            'content' => $new_content,
+            'duedate_formatted' => '10 Apr 2023',
+        ];
 
         $_SERVER['REMOTE_USER'] = 'user1';
         $notifier = $this->createMock(AssignedNotifier::class);
