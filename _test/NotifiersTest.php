@@ -223,6 +223,12 @@ Brief description of the task.',
                 ReminderNotifier::class, [], $new_data, $new_data,
                 'reminder'
             ],
+            'No Date ReminderNotifier' => [
+                ReminderNotifier::class, [],
+                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
+                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
+                'reminder'
+            ],
             'TodayNotifier' => [
                 TodayNotifier::class, $new_data['assignees'],
                 array_replace($new_data, ['duedate' => $today]),
@@ -233,6 +239,12 @@ Brief description of the task.',
                 TodayNotifier::class, [], $new_data, $new_data,
                 'today'
             ],
+            'No Date TodayNotifier' => [
+                TodayNotifier::class, [],
+                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
+                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
+                'today'
+            ],
             'OverdueNotifier' => [
                 OverdueNotifier::class, $new_data['assignees'], $new_data,
                 $new_data, 'overdue'
@@ -241,6 +253,12 @@ Brief description of the task.',
                 OverdueNotifier::class, [],
                 array_replace($new_data, ['duedate' => $tomorrow]),
                 array_replace($new_data, ['duedate' => $tomorrow]),
+                'overdue'
+            ],
+            'No Date OverdueNotifier' => [
+                OverdueNotifier::class, [],
+                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
+                array_replace($new_data, ['duedate' => null, 'duedate_formatted' => '']),
                 'overdue'
             ],
         ];

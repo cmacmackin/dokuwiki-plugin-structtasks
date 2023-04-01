@@ -71,6 +71,7 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
         $this->loadSchemaJSON('baddate', '', 100);
         $this->rev1 = time() - 1;
         $this->rev2 = time();
+        $this->rev3 = time() + 1;
         $this->old_metadata = ['duedate' => '2023-03-26',
                                'assignees' => ['user1'],
                                'status' => 'Ongoing'];
@@ -89,12 +90,23 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
                                'status' => 'Ongoing',
                                'duedate_formatted' => '10 Apr 2023',
         ];
+        $this->nodate_metadata = ['duedate' => '',
+                                  'assignees' => ['user1'],
+                                  'status' => 'Ongoing'];
+        $this->nodate_expected = ['duedate' => null,
+                                  'assignees' => ['Arron Dom Person <adperson@example.com>'],
+                                  'status' => 'Ongoing',
+                                  'duedate_formatted' => '',
+        ];
         $this->saveData('some:page', 'valid',
                         $this->old_metadata,
                         $this->rev1);
         $this->saveData('some:page', 'valid',
                         $this->new_metadata,
                         $this->rev2);
+        $this->saveData('some:page', 'valid',
+                        $this->nodate_metadata,
+                        $this->rev3);
         saveWikiText('another:page', 'page without a task', 'saved for testing');
      }
 
@@ -106,6 +118,18 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
             $this->assertEquals($old_data[$key], $val);
         }
         foreach ($this->new_expected as $key => $val) {
+            $this->assertEquals($new_data[$key], $val);
+        }
+    }
+
+    function testGetMetadataNoDate() {
+        list($old_data, $new_data, $valid) = $this->util->getMetadata(
+            'some:page', 'valid', $this->rev1, $this->rev3);
+        $this->assertTrue($valid);
+        foreach ($this->old_expected as $key => $val) {
+            $this->assertEquals($old_data[$key], $val);
+        }
+        foreach ($this->nodate_expected as $key => $val) {
             $this->assertEquals($new_data[$key], $val);
         }
     }
