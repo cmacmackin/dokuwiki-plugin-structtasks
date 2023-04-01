@@ -20,7 +20,7 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
 
     public $notifiers = array();
 
-    private Utilities $util;
+    private $util;
 
     public function __constructor() {
         // Insantiate the Notifier objects
