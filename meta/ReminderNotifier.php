@@ -18,7 +18,7 @@ class ReminderNotifier extends AbstractNotifier
 {
     const lang_key_prefix = 'reminder';
 
-    private int $days_before;
+    private $days_before;
 
     /**
      * Constructor allows you to specify how many days before the

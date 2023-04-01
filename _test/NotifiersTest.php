@@ -11,10 +11,10 @@ use dokuwiki\plugin\structtasks\meta\DateNotifier;
 use dokuwiki\plugin\structtasks\meta\DeletedNotifier;
 use dokuwiki\plugin\structtasks\meta\OpenStatusNotifier;
 use dokuwiki\plugin\structtasks\meta\RemovedNotifier;
-//use dokuwiki\plugin\structtasks\meta\ReminderNotifier;
+use dokuwiki\plugin\structtasks\meta\ReminderNotifier;
 use dokuwiki\plugin\structtasks\meta\SelfRemovalNotifier;
-//use dokuwiki\plugin\structtasks\meta\TodayNotifier;
-//use dokuwiki\plugin\structtasks\meta\OverdueNotifier;
+use dokuwiki\plugin\structtasks\meta\TodayNotifier;
+use dokuwiki\plugin\structtasks\meta\OverdueNotifier;
 
 
 /**
@@ -213,36 +213,36 @@ Brief description of the task.',
                 OpenStatusNotifier::class, [], $old_data,
                 $empty_data, 'openstatus'
             ],
-            // 'ReminderNotifier' => [
-            //     ReminderNotifier::class, $new_data['assignees'],
-            //     array_replace($new_data, ['duedate' => $tomorrow]),
-            //     array_replace($new_data, ['duedate' => $tomorrow]),
-            //     'reminder'
-            // ],
-            // 'Not ReminderNotifier' => [
-            //     ReminderNotifier::class, [], $new_data, $new_data,
-            //     'reminder'
-            // ],
-            // 'TodayNotifier' => [
-            //     TodayNotifier::class, $new_data['assignees'],
-            //     array_replace($new_data, ['duedate' => $today]),
-            //     array_replace($new_data, ['duedate' => $today]),
-            //     'today'
-            // ],            
-            // 'Not TodayNotifier' => [
-            //     TodayNotifier::class, [], $new_data, $new_data,
-            //     'today'
-            // ],
-            // 'OverdueNotifier' => [
-            //     OverdueNotifier::class, $new_data['assignees'], $new_data,
-            //     $new_data, 'overdue'
-            // ],
-            // 'Not OverdueNotifier' => [
-            //     OverdueNotifier::class, [],
-            //     array_replace($new_data, ['duedate' => $tomorrow]),
-            //     array_replace($new_data, ['duedate' => $tomorrow]),
-            //     'overdue'
-            // ],
+            'ReminderNotifier' => [
+                ReminderNotifier::class, $new_data['assignees'],
+                array_replace($new_data, ['duedate' => $tomorrow]),
+                array_replace($new_data, ['duedate' => $tomorrow]),
+                'reminder'
+            ],
+            'Not ReminderNotifier' => [
+                ReminderNotifier::class, [], $new_data, $new_data,
+                'reminder'
+            ],
+            'TodayNotifier' => [
+                TodayNotifier::class, $new_data['assignees'],
+                array_replace($new_data, ['duedate' => $today]),
+                array_replace($new_data, ['duedate' => $today]),
+                'today'
+            ],            
+            'Not TodayNotifier' => [
+                TodayNotifier::class, [], $new_data, $new_data,
+                'today'
+            ],
+            'OverdueNotifier' => [
+                OverdueNotifier::class, $new_data['assignees'], $new_data,
+                $new_data, 'overdue'
+            ],
+            'Not OverdueNotifier' => [
+                OverdueNotifier::class, [],
+                array_replace($new_data, ['duedate' => $tomorrow]),
+                array_replace($new_data, ['duedate' => $tomorrow]),
+                'overdue'
+            ],
         ];
     }
 
