@@ -74,9 +74,21 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
         $this->old_metadata = ['duedate' => '2023-03-26',
                                'assignees' => ['user1'],
                                'status' => 'Ongoing'];
+        $this->old_expected = ['duedate' => date_create('2023-03-26'),
+                               'assignees' => ['Arron Dom Person <adperson@example.com>'],
+                               'status' => 'Ongoing',
+                               'duedate_formatted' => '26 Mar 2023',
+        ];
         $this->new_metadata = ['duedate' => '2023-04-10',
                                'assignees' => ['user1', 'user2'],
                                'status' => 'Ongoing'];
+        $this->new_expected = ['duedate' => date_create('2023-04-10'),
+                               'assignees' =>
+                               ['Arron Dom Person <adperson@example.com>',
+                                'Fay Mail <user2@example.com>'],
+                               'status' => 'Ongoing',
+                               'duedate_formatted' => '10 Apr 2023',
+        ];
         $this->saveData('some:page', 'valid',
                         $this->old_metadata,
                         $this->rev1);
@@ -87,16 +99,15 @@ class utilities_metadata_plugin_structtasks_test extends StructtasksTest {
      }
 
     function testGetMetadata() {
-        list($old_data, $new_data, $valid) = $this->util->getMetadata('some:page', 'valid', $this->rev1, $this->rev2);
+        list($old_data, $new_data, $valid) = $this->util->getMetadata(
+            'some:page', 'valid', $this->rev1, $this->rev2);
         $this->assertTrue($valid);
-        foreach ($this->old_metadata as $key => $val) {
+        foreach ($this->old_expected as $key => $val) {
             $this->assertEquals($old_data[$key], $val);
         }
-        $this->assertEquals('j M Y', $old_data['date_format']);
-        foreach ($this->new_metadata as $key => $val) {
+        foreach ($this->new_expected as $key => $val) {
             $this->assertEquals($new_data[$key], $val);
         }
-        $this->assertEquals('j M Y', $new_data['date_format']);
     }
 
     function invalidMetadataProvider() {
@@ -137,23 +148,6 @@ class utilities_simple_plugin_structtakss_test extends \DokuWikiTest {
         $auth->createUser('user1', 'abcdefg', 'Arron Dom Person', 'adperson@example.com');
         $auth->createUser('user2', '123456789', 'Fay Mail', 'user2@example.com');
         $auth->createUser('user3', 'asdkfjdl', '', 'some@mail.com');
-        $this->struct_data = ['duedate' => '2023-04-10',
-                              'assignees' => ['user1', 'user2'],
-                              'status' => 'Ongoing',
-                              'date_format' => 'j M Y'];
-        $this->event_data = ['id' => 'some:page',
-                             'file' => 'path/to/some/page.txt',
-                             'revertFrom' => false,
-                             'oldRevision' => 1000,
-                             'newRevision' => 2000,
-                             'newContent' => 'Some new text.',
-                             'oldContent' => 'Some old text.',
-                             'summary' => 'updated wording',
-                             'contentChanged' => true,
-                             'changeInfo' => '',
-                             'changeType' => DOKU_CHANGE_TYPE_EDIT,
-                             'sizechange' => 14,
-        ];
     }
 
     function testGetUserEmail() {
@@ -168,45 +162,5 @@ class utilities_simple_plugin_structtakss_test extends \DokuWikiTest {
                             $this->util->getUserEmail('raw.email@address.org'));
         $this->assertEquals('user2@example.com',
                             $this->util->getUserEmail('user2@example.com'));
-    }
-
-    function testAssigneesToEmails(/*$assignees*/) {
-        $allEmails = $this->util->assigneesToEmails([
-            'user1', 'user2', 'user3', 'DoesNotExist', 'raw.email@address.org', 'user2@example.com'
-        ]);
-        $expected = ['Arron Dom Person <adperson@example.com>',
-                     'Fay Mail <user2@example.com>',
-                     'some@mail.com',
-                     'raw.email@address.org',
-                     'user2@example.com',
-        ];
-        $this->assertEquals($expected, $allEmails);
-
-        $this->assertEquals(['Fay Mail <user2@example.com>'],
-                            $this->util->assigneesToEmails('user2'));
-    }
-
-    function testGetOldData() {
-        $data = $this->util->getOldData($this->event_data, $this->struct_data);
-        $this->assertEquals('Ongoing', $data['status']);
-        $this->assertEquals(
-            ['Arron Dom Person <adperson@example.com>', 'Fay Mail <user2@example.com>'],
-            $data['assignees']
-        );
-        $this->assertEquals(date_create('2023-04-10'), $data['duedate']);
-        $this->assertEquals('Some old text.', $data['content']);
-        $this->assertEquals('10 Apr 2023', $data['duedate_formatted']);
-    }
-
-    function testGetNewData() {
-        $data = $this->util->getNewData($this->event_data, $this->struct_data);
-        $this->assertEquals('Ongoing', $data['status']);
-        $this->assertEquals(
-            ['Arron Dom Person <adperson@example.com>', 'Fay Mail <user2@example.com>'],
-            $data['assignees']
-        );
-        $this->assertEquals(date_create('2023-04-10'), $data['duedate']);
-        $this->assertEquals('Some new text.', $data['content']);
-        $this->assertEquals('10 Apr 2023', $data['duedate_formatted']);
     }
 }

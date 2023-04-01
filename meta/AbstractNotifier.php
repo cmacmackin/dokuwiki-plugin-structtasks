@@ -58,7 +58,7 @@ abstract class AbstractNotifier
     public function __construct(callable $getConf, callable $getLang) {
         $this->getConf = $getConf;
         $this->getLang = $getLang;
-    }
+  }
 
     abstract function getNotifiableUsers($page, $editor_email, $new_data, $old_data);
 
@@ -79,6 +79,9 @@ abstract class AbstractNotifier
      * string.
      */
     static function dueIn($duedate) {
+        if (is_null($duedate)) {
+            return '';
+        }
         list($y, $m, $d) = array_map('abs', self::timeFromLastMidnight($duedate));
         $components = [];
         if ($y != 0) {
@@ -116,9 +119,10 @@ abstract class AbstractNotifier
      * the following keys:
      *
      *    - content: The page content.
-     *    - duedate: A DateTime object specifying when the task is due.
+     *    - duedate: A DateTime object specifying when the task is
+     *      due. If no date was specified for this page, will be NULL. 
      *    - duedate_formatted: A string with the due-date formatted
-     *      according to the struct schema
+     *      according to the struct schema. Empty if no date specified.
      *    - assignees: An array of email addresses for the people this
      *      task has been assigned to.
      *    - status: The completion status of the task.

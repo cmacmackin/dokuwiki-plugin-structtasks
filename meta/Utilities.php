@@ -24,7 +24,7 @@ class Utilities
     protected $struct;
     /// Date-time formata for the due-date, extracted from the
     /// most-recently validated schema and cached here.
-    protected $duedate_format;
+    protected $duedate_formats = [];
 
     /**
      *  Pass in an instance of the struct_helper plugin when building this class;
@@ -77,8 +77,19 @@ class Utilities
                 }
             }
         }
-        if ($valid) $this->duedate_format = $s->findColumn('duedate')->getType()->getConfig()['format'];
+        if ($valid) $this->duedate_formats[$schema] = $s->findColumn('duedate')->getType()->getConfig()['format'];
         return $valid;
+    }
+
+    /**
+     * Gets the date format for the specified schema. Throws an error
+     * if schema is not valid for use by structtasks.
+     */
+    function dateFormat($schema) {
+        if (!array_key_exists($schema, $this->duedate_formats)) {
+            $this->isValidSchema($schema);
+        }
+        return $this->duedate_formats[$schema];
     }
     
     /**
@@ -87,7 +98,7 @@ class Utilities
      * valid task for which notifications could be sent.
      */
     function getMetadata($id, $schema, $old_rev, $new_rev) {
-        if (!$this::isValidSchema($schema)) {
+        if (!$this->isValidSchema($schema)) {
             return [NULL, NULL, false];
         }
         $old_data = $this->struct->getData($id, null, $old_rev);
@@ -95,9 +106,12 @@ class Utilities
         if (!array_key_exists($schema, $old_data) or !array_key_exists($schema, $new_data)) {
             return [NULL, NULL, false];
         }
-        $old_data[$schema]['date_format'] = $this->duedate_format;
-        $new_data[$schema]['date_format'] = $this->duedate_format;
-        return [$old_data[$schema], $new_data[$schema], true];
+        $dateformat = $this->dateFormat($schema);
+        $old_data[$schema]['date_format'] = 
+        $new_data[$schema]['date_format'] = $this->dateFormat($schema);
+        return [$this->formatData($old_data[$schema], $dateformat),
+                $this->formatData($new_data[$schema], $dateformat),
+                true];
     }
 
     /**
@@ -130,42 +144,25 @@ class Utilities
             $assignees = [$assignees];
         }
         return array_values(array_filter(array_map([$this, 'getUserEmail'], $assignees)));
-    }
+   } 
 
     /**
-     * Creates the $old_data array to be passed to
-     * AbstractNotifier::sendMessage
-     * @return array
-     * @param mixed $eventdata
-     * @param mixed $structdata
+     * Processes the data returned by the struct plugin to put it in a
+     * format useful for this plugin.
      */
-    function getOldData($eventdata, $structdata): array {
-        $d = date_create($structdata['duedate']);
+    function formatData($structdata, $dateformat) {
+        if ($structdata['duedate'] !== '') {
+            $d = date_create($structdata['duedate']);
+            $df = $d->format($dateformat);
+        } else {
+            $d = null;
+            $df = '';
+        }
         return [
-            'content' => $eventdata['oldContent'],
             'duedate' => $d,
-            'duedate_formatted' => $d->format($structdata['date_format']),
+            'duedate_formatted' => $df,
             'assignees' => $this->assigneesToEmails($structdata['assignees']),
             'status' => $structdata['status'],
         ];
     }
-
-    /**
-     * Creates the $new_data array to be passed to
-     * AbstractNotifier::sendMessage
-     * @return array
-     * @param mixed $eventdata
-     * @param mixed $structdata
-     */
-    function getNewData($eventdata, $structdata): array {
-        $d = date_create($structdata['duedate']);
-        return [
-            'content' => $eventdata['newContent'],
-            'duedate' => $d,
-            'duedate_formatted' => $d->format($structdata['date_format']),
-            'assignees' => $this->assigneesToEmails($structdata['assignees']),
-            'status' => $structdata['status'],
-        ];
-    }
-
 }

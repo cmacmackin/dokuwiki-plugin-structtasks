@@ -63,7 +63,7 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         $util = new Utilities($struct);
 
         $id = $event->data['id'];
-        list($old_structdata, $new_structdata, $valid) = $util->getMetadata(
+        list($old_data, $new_data, $valid) = $util->getMetadata(
             $id, $schema, $event->data['oldRevision'], $event->data['newRevision']
         );
         if (!$valid) return;
@@ -76,8 +76,8 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         $editor_name = ($userData !== false and $userData['name'] !== '') ?
                      $userData['name'] : $editor_id;
         $editor_email = $util->getUserEmail($editor_id);
-        $new_data = $util->getNewData($event->data, $new_structdata);
-        $old_data = $util->getOldData($event->data, $old_structdata);
+        $new_data['content'] = $event->data['newContent'];
+        $old_data['content'] = $event->data['oldContent'];
 
         foreach ($this->notifiers as $notifier) {
             $notifier->sendMessage($id, $title, $editor_name, $editor_email, $new_data, $old_data);
