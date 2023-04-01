@@ -30,7 +30,7 @@ class Utilities
      *  Pass in an instance of the struct_helper plugin when building this class;
      * @param mixed $helper
      */
-    public function __construct(private $helper) {
+    public function __construct($helper) {
         $this->struct = $helper;
     }
 
