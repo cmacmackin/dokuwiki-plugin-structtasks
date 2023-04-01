@@ -66,8 +66,11 @@ abstract class AbstractNotifier
         $today = date_create();
         $today->setTime(0, 0);
         $date->setTime(0, 0);
-        $diff = $date->diff($today);
-        return [$diff->y, $diff->m, $diff->d];
+        // For some reason, diff always seems to return absolute
+        // value, so just handling that manually here
+        $diff = $date->diff($today, true);
+        $factor = ($today < $date) ? 1 : -1;
+        return [$factor * $diff->y, $factor * $diff->m, $factor * $diff->d];
     }
     
     /**
@@ -76,21 +79,21 @@ abstract class AbstractNotifier
      * string.
      */
     static function dueIn($duedate) {
-        list($y, $m, $d) = self::timeFromLastMidnight($duedate);
+        list($y, $m, $d) = array_map('abs', self::timeFromLastMidnight($duedate));
         $components = [];
         if ($y != 0) {
             $val = "{$y} year";
-            if (abs($y) > 1) $val .= 's';
+            if ($y > 1) $val .= 's';
             $components[] = $val;
         }
         if ($m != 0) {
             $val = "{$m} month";
-            if (abs($m) > 1) $val .= 's';
+            if ($m > 1) $val .= 's';
             $components[] = $val;
         }
         if ($d != 0) {
             $val = "{$d} day";
-            if (abs($d) > 1) $val .= 's';
+            if ($d > 1) $val .= 's';
             $components[] = $val;
         }
         switch (count($components)) {

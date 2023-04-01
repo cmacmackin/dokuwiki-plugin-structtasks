@@ -7,7 +7,6 @@
  */
 
 use dokuwiki\plugin\structtasks\meta\Utilities;
-
 use dokuwiki\plugin\structtasks\meta\AssignedNotifier;
 use dokuwiki\plugin\structtasks\meta\ClosedStatusNotifier;
 use dokuwiki\plugin\structtasks\meta\DateNotifier;
@@ -21,7 +20,11 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
 
     public $notifiers = array();
 
-    public function __constructor() {
+    private Utilities $util;
+    /**
+     * @return void
+     */
+    public function __constructor(): void {
         // Insantiate the Notifier objects
         $this->util = new Utilities();
         $getConf = [$this, 'getConf'];
@@ -37,8 +40,9 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         ];
     }
     
-    /** @inheritDoc */
-    public function register(Doku_Event_Handler $controller)
+    /**
+ * @return void @inheritDoc */
+    public function register(Doku_Event_Handler $controller): void
     {
         // This must run AFTER the Struct plugin has updated the metadata
         $controller->register_hook('COMMON_WIKIPAGE_SAVE', 'AFTER', $this, 'handle_common_wikipage_save', null, 3999);

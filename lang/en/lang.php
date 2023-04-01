@@ -6,7 +6,7 @@
  */
 
 $lang['assigned_subject'] = 'You\'v been assigned task "@TITLE@"';
-$lang['assigned_text'] = 'You have been assigned the task "TITLELINK" on @WIKINAME@ by @EDITOR@. This task should be completed by @DUEDATE@. Be sure to mark the task as completed and edit the page to reflect the outcome once you are finished: @EDITURL@.';
+$lang['assigned_text'] = 'You have been assigned the task @TITLELINK@ on @WIKINAME@ by @EDITOR@. This task should be completed by @DUEDATE@. Be sure to mark the task as completed and edit the page to reflect the outcome once you are finished: @EDITURL@.';
 $lang['assigned_html'] = <<<'END'
 <h1>@WIKINAME@ Task Assignment</h1>
 You have been assigned the task <strong>@TITLELINK@</strong> by @EDITOR@.
@@ -64,4 +64,31 @@ $lang['deleted_text'] = '@EDITOR@ has deleted the task @TITLELINK@ on @WIKINAME@
 $lang['deleted_text'] = <<<'END'
 <h1>@WIKINAME@ Task Deleted</h1>
 @EDITOR@ has deleted task @TITLELINK@. No further action is required.
+END;
+
+$lang['reminder_subject'] = 'Reminder: task "@TITLE@" due in @DUEIN@';
+$lang['reminder_text'] = 'Your task @TITLELINK@ on @WIKINAME@ is due in @DUEIN@, on @DUEDATE@. Be sure to mark the task as completed and edit the page to reflect the outcome once you are finished: @EDITURL@.';
+$lang['reminder_text'] = <<<'END'
+<h1>@WIKINAME@ Task Due in @DUEIN@</h1>
+Your task @TITLELINK@ on @WIKINAME@ is due in @DUEIN@, on @DUEDATE@. Be
+sure to mark the task as completed and <a href="@EDITURL@">edit the page</a>
+to reflect the outcome once you are finished.
+END;
+
+$lang['today_subject'] = 'Reminder: Task "@TITLE@" due today!';
+$lang['today_text'] = 'Your task @TITLELINK@ on @WIKINAME@ is due today! Please finish it. Once done, be sure to mark the task as completed and edit the page to reflect the outcome: @EDITURL@.';
+$lang['today_text'] = <<<'END'
+<h1>@WIKINAME@ Task Due Today</h1>
+Your task @TITLELINK@ on @WIKINAME@ is due today! Please finish it. Once done,
+be sure to mark the task as completed and <a href="@EDITURL@">edit the page</a>
+to reflect the outcome.
+END;
+
+$lang['overdue_subject'] = 'Your task "@TITLE@" is overdue!';
+$lang['overdue_text'] = 'Your task @TITLELINK@ on @WIKINAME@ is @DUEIN@ days overdue! Complete it right away and update the page to reflect the outcome: @EDITURL@.';
+$lang['overdue_text'] = <<<'END'
+<h1>@WIKINAME@ Task Overdue!</h1>
+Your task @TITLELINK@ on @WIKINAME@ is due today! <strong>Complete it right
+away</strong> and <a href="@EDITURL@">update the page</a> to reflect the
+outcome.
 END;
