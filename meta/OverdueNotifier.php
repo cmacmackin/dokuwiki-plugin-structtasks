@@ -19,6 +19,7 @@ class OverdueNotifier extends AbstractNotifier
     const lang_key_prefix = 'overdue';
 
     public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
+        if (is_null($new_data['duedate'])) return [];
         $time_remaining = $this->timeFromLastMidnight($new_data['duedate']);
         $days = $time_remaining[0] * 365 + $time_remaining[1] * 31 + $time_remaining[2];
         if ($days < 0) {

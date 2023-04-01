@@ -22,20 +22,22 @@ class ReminderNotifier extends AbstractNotifier
 
     /**
      * Constructor allows you to specify how many days before the
-     * deadline the reminder should be sent.
+     * deadline the reminder should be sent. This is done by passing
+     * an array with the days on which to provide notifications.
      */
     public function __construct(callable $getConf, callable $getLang,
-                                int $days_before = 1) {
+                                array $days_before = [1]) {
         parent::__construct($getConf, $getLang);
         $this->days_before = $days_before;
     }
 
     public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
+        if (is_null($new_data['duedate'])) return [];
         // FIXME: if $days_before is more than one month then this
         // won't be very accurate
         $time_remaining = $this->timeFromLastMidnight($new_data['duedate']);
         $days = $time_remaining[0] * 365 + $time_remaining[1] * 31 + $time_remaining[2];
-        if ($days == $this->days_before) {
+        if (in_array($days, $this->days_before)) {
             return $new_data['assignees'];
         }
         return [];
