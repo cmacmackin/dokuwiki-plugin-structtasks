@@ -21,10 +21,8 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
     public $notifiers = array();
 
     private Utilities $util;
-    /**
-     * @return void
-     */
-    public function __constructor(): void {
+
+    public function __constructor() {
         // Insantiate the Notifier objects
         $this->util = new Utilities();
         $getConf = [$this, 'getConf'];
@@ -40,8 +38,7 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         ];
     }
     
-    /**
- * @return void @inheritDoc */
+    /** @inheritDoc */
     public function register(Doku_Event_Handler $controller): void
     {
         // This must run AFTER the Struct plugin has updated the metadata
