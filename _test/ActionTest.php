@@ -9,25 +9,31 @@ use dokuwiki\plugin\structtasks\meta\AssignedNotifier;
 use DokuWikiTest;
 
 /**
- * General tests for the structtasks plugin
+ * Tests action handler for structtasks plugin
  *
  * @group plugin_structtasks
  * @group plugins
  */
 
 class action_plugin_structtasks_test extends StructtasksTest {
-    // Test does nothing when page not assigned schema
-    // Test does nothing when no schema set
-    // Test sending correct assortment of notifications
-    protected $pluginsEnabled = array('structtasks', 'struct', 'sqlite');
 
-    public function setUp(): void {
-        parent::setUp();
-    }
+    protected $pluginsEnabled = array('structtasks', 'struct', 'sqlite');
     
     function testPageSaveNoAction() {
         global $conf;
         $conf['plugin']['structtasks']['schema'] = 'valid';
+        $this->loadSchemaJSON('valid', '', 100);
+        $action = plugin_load('action', 'structtasks');
+        $action->loadConfig();
+        $notifier = $this->createMock(AssignedNotifier::class);
+        $notifier->expects($this->never())->method('sendMessage');
+        $action->notifiers = [$notifier];
+        saveWikiText('some:page', 'test page content', 'saved for testing');
+    }
+
+    function testNoSchema() {
+        global $conf;
+        $conf['plugin']['structtasks']['schema'] = '';
         $this->loadSchemaJSON('valid', '', 100);
         $action = plugin_load('action', 'structtasks');
         $action->loadConfig();
