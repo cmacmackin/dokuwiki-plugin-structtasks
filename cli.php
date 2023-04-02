@@ -53,14 +53,15 @@ class cli_plugin_structtasks extends \dokuwiki\Extension\CLIPlugin
      * initialises successfully (e.g., all configurations are valid,
      * necessary plugins available, etc.), false otherwise.
      */
-    public function initialise() : bool {
+    public function initialise($verbose = true) : bool {
         $this->schema = $this->getConf('schema');
         if ($this->schema == '') return false;
         $this->struct = $this->loadHelper('struct', true);
         if (is_null($this->struct)) return false;
         $this->util = new Utilities($this->struct);
         if (!$this->util->isValidSchema($this->schema)) {
-            $this->error(sprintf($this->getLang('msg_invalid_schema'), $this->schema));
+            if ($verbose) $this->error(
+                sprintf($this->getLang('msg_invalid_schema'), $this->schema));
             return false;
         }
         $this->dateformat = $this->util->dateFormat($this->schema);

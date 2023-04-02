@@ -33,14 +33,14 @@ class cli_plugin_structtasks_test extends StructtasksTest {
         $conf['plugin']['structtasks']['schema'] = 'badstatus';
         $this->loadSchemaJSON('badstatus', '', 100);
         $cli = plugin_load('cli', 'structtasks');
-        $this->assertFalse($cli->initialise());
+        $this->assertFalse($cli->initialise(false));
     }
 
     function testInitialiseMissingSchema() {
         global $conf;
         $conf['plugin']['structtasks']['schema'] = 'valid';
         $cli = plugin_load('cli', 'structtasks');
-        $this->assertFalse($cli->initialise());
+        $this->assertFalse($cli->initialise(false));
     }
 
     function testInitialiseNoSchema() {
