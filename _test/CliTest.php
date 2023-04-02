@@ -72,4 +72,48 @@ class cli_plugin_structtasks_test extends StructtasksTest {
         $n = $cli->createNotifiers([], false);
         $this->assertEquals(0, count($n));
     }
+
+    function testProcessTask() {
+        global $auth;
+        $auth->createUser('user1', 'abcdefg', 'Some One', 'so@example.com');
+
+        global $conf;
+        $conf['plugin']['structtasks']['schema'] = 'valid';
+        $this->loadSchemaJSON('valid', '', 100);
+        $cli = plugin_load('cli', 'structtasks');
+        $this->assertTrue($cli->initialise());
+
+        $page = 'some:page';
+        $page_title = 'Some Title';
+        $content = "====== ${page_title} ======\nInitial content";
+        $data = ['duedate' => '2023-03-27',
+                 'assignees' => ['user1'],
+                 'status' => 'Ongoing'];
+        $expected_data =[
+            'duedate' => date_create($data['duedate']),
+            'assignees' => ['Some One <so@example.com>'],
+            'status' => $data['status'],
+            'content' => $content,
+            'duedate_formatted' => '27 Mar 2023',
+        ];
+        $access = AccessTable::getPageAccess('valid', $page, time());
+        $access->saveData($data);
+        saveWikiText($page, $content, 'save 1');
+
+        $notifier = $this->createMock(TodayNotifier::class);
+        $notifier->expects($this->once())
+                 ->method('sendMessage')
+                 ->with($this->equalTo($page),
+                        $this->equalTo($page_title),
+                        $this->equalTo(''),
+                        $this->equalTo(''),
+                        $this->equalTo($expected_data),
+                        $this->equalTo($expected_data)
+                 );
+
+        $assignments = Assignments::getInstance();
+        $assignments->assignPageSchema($page, 'valid');
+
+        $cli->processTask($page, [$notifier]);
+    }
 }
