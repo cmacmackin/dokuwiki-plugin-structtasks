@@ -157,7 +157,10 @@ abstract class AbstractNotifier
             'WIKINAME' => $conf['title'],
             'DUEIN' => $this->dueIn($new_data['duedate']),
         ];
-        $html_subs = ['TITLELINK' => "&ldquo;<a href=\"${url}\">${page_title}</a>&rdquo;"];
+        $html_subs = [
+            'TITLELINK' => "&ldquo;<a href=\"${url}\">${page_title}</a>&rdquo;",
+            'EDITURL' => "<a href=\"{$text_subs['EDITURL']}\">edit the page</a>"
+        ];
         $subject = str_replace(
             array_map(function ($x) {return "@$x@";}, array_keys($text_subs)),
             $text_subs,

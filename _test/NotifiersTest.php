@@ -291,7 +291,7 @@ Brief description of the task.',
             $url = DOKU_URL . DOKU_SCRIPT . '?id=' . $this::page_id;
             $text_replacements = [
                 'TITLE' => $this::page_title,
-                'TITLELINK' => $this::page_title . " <${url}>",
+                'TITLELINK' => '"' . $this::page_title . "\" <${url}>",
                 'EDITURL' => "${url}&do=edit",
                 'EDITOR' => $this::editor,
                 'STATUS' => $new_data['status'],
@@ -302,7 +302,8 @@ Brief description of the task.',
                 'WIKINAME' => 'My Test Wiki',
             ];
             $html_replacements = [
-                'TITLELINK' => "<a href=\"${url}\">" . $this::page_title . '</a>'
+                'TITLELINK' => "&ldquo;<a href=\"${url}\">" . $this::page_title . '</a>&rdquo;',
+                'EDITURL' => "<a href=\"${url}&do=edit\">edit the page</a>",
             ];
             $expected_subject = "Check substitutions:";
             foreach($text_replacements as $t) {
