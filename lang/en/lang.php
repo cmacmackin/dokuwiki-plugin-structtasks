@@ -11,7 +11,7 @@ $lang['assigned_html'] = <<<'END'
 <h1>@WIKINAME@ Task Assignment</h1>
 You have been assigned the task <strong>@TITLELINK@</strong> by @EDITOR@.
 This task should be completed by @DUEDATE@. Be sure to mark the task as
-completed and <a href="@EDITURL@">edit the page</a> to reflect the outcome
+completed and @EDITURL@ to reflect the outcome
 once you are finished.
 END;
 
@@ -37,7 +37,7 @@ $lang['date_html'] = <<<'END'
 <h1>@WIKINAME@ Task Due-Date Change</h1>
 @EDITOR@ has changed the due-date for task @TITLELINK@. <strong>It must now be
 completed by @DUEDATE@.</strong> The previous due-date was @PREVDUEDATE@. Be
-sure to mark the task as completed and <a href="@EDITURL@">edit the page</a> to
+sure to mark the task as completed and @EDITURL@ to
 reflect the outcome once you are finished.
 END;
 
@@ -47,7 +47,7 @@ $lang['openstatus_text'] = <<<'END'
 <h1>@WIKINAME@ Task @STATUS@</h1>
 @EDITOR@ has changed task @TITLELINK@ from "@PREVSTATUS@" to "@STATUS@". It is
 due on @DUEDATE@. Be sure to mark the task as completed and
-<a href="@EDITURL@">edit the page</a> to reflect the outcome once you are
+@EDITURL@ to reflect the outcome once you are
 finished.
 END;
 
@@ -71,7 +71,7 @@ $lang['reminder_text'] = 'Your task @TITLELINK@ on @WIKINAME@ is due in @DUEIN@,
 $lang['reminder_text'] = <<<'END'
 <h1>@WIKINAME@ Task Due in @DUEIN@</h1>
 Your task @TITLELINK@ on @WIKINAME@ is due in @DUEIN@, on @DUEDATE@. Be
-sure to mark the task as completed and <a href="@EDITURL@">edit the page</a>
+sure to mark the task as completed and @EDITURL@
 to reflect the outcome once you are finished.
 END;
 
@@ -80,7 +80,7 @@ $lang['today_text'] = 'Your task @TITLELINK@ on @WIKINAME@ is due today! Please 
 $lang['today_text'] = <<<'END'
 <h1>@WIKINAME@ Task Due Today</h1>
 Your task @TITLELINK@ on @WIKINAME@ is due today! Please finish it. Once done,
-be sure to mark the task as completed and <a href="@EDITURL@">edit the page</a>
+be sure to mark the task as completed and @EDITURL@
 to reflect the outcome.
 END;
 
@@ -89,7 +89,7 @@ $lang['overdue_text'] = 'Your task @TITLELINK@ on @WIKINAME@ is @DUEIN@ days ove
 $lang['overdue_text'] = <<<'END'
 <h1>@WIKINAME@ Task Overdue!</h1>
 Your task @TITLELINK@ on @WIKINAME@ is due today! <strong>Complete it right
-away</strong> and <a href="@EDITURL@">update the page</a> to reflect the
+away</strong> and @EDITURL@ to reflect the
 outcome.
 END;
 

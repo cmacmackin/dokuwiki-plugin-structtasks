@@ -18,13 +18,23 @@ use dokuwiki\plugin\structtasks\meta\SelfRemovalNotifier;
 class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
 {
 
-    public $notifiers = array();
+    public $notifiers;
 
     private $util;
+    
+    /** @inheritDoc */
+    public function register(Doku_Event_Handler $controller): void
+    {
+        // This must run AFTER the Struct plugin has updated the metadata
+        $controller->register_hook('COMMON_WIKIPAGE_SAVE', 'AFTER', $this, 'handle_common_wikipage_save', null, 3999);
+   
+    }
 
-    public function __constructor() {
-        // Insantiate the Notifier objects
-        $this->util = new Utilities();
+    /**
+     * Set up notifier objects, if they haven't been set already.
+     */
+    private function initNotifiers(): void {
+        if (isset($this->notifiers)) return;
         $getConf = [$this, 'getConf'];
         $getLang = [$this, 'getLang'];
         $this->notifiers = [
@@ -38,14 +48,6 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
         ];
     }
     
-    /** @inheritDoc */
-    public function register(Doku_Event_Handler $controller): void
-    {
-        // This must run AFTER the Struct plugin has updated the metadata
-        $controller->register_hook('COMMON_WIKIPAGE_SAVE', 'AFTER', $this, 'handle_common_wikipage_save', null, 3999);
-   
-    }
-
     /**
      * Event handler for notifying task assignees of task changes or creation
      *
@@ -70,6 +72,7 @@ class action_plugin_structtasks extends \dokuwiki\Extension\ActionPlugin
 
         global $INPUT;
         global $auth;
+        $this->initNotifiers();
         $title = p_get_first_heading($id, METADATA_RENDER_USING_SIMPLE_CACHE);
         $editor_id = $INPUT->server->str('REMOTE_USER');
         $userData = $auth->getUserData($editor_id, false);
