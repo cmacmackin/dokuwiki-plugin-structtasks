@@ -147,7 +147,7 @@ abstract class AbstractNotifier
         $url = wl($page_id, [], true);
         $text_subs = [
             'TITLE' => $page_title,
-            'TITLELINK' => "${page_title} <${url}>",
+            'TITLELINK' => "\"${page_title}\" <${url}>",
             'EDITURL' => wl($page_id, ['do' => 'edit'], true, '&'),
             'EDITOR' => $editor,
             'STATUS' => $new_data['status'],
@@ -157,7 +157,7 @@ abstract class AbstractNotifier
             'WIKINAME' => $conf['title'],
             'DUEIN' => $this->dueIn($new_data['duedate']),
         ];
-        $html_subs = ['TITLELINK' => "<a href=\"${url}\">${page_title}</a>"];
+        $html_subs = ['TITLELINK' => "&ldquo;<a href=\"${url}\">${page_title}</a>&rdquo;"];
         $subject = str_replace(
             array_map(function ($x) {return "@$x@";}, array_keys($text_subs)),
             $text_subs,
