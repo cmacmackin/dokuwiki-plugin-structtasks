@@ -183,7 +183,7 @@ class cli_plugin_structtasks_test extends StructtasksTest {
                                         $this->equalTo(''),
                                         $this->equalTo(''),
                                         $this->equalTo($expected_data[0]),
-                                        $this->equalTo($expected_data[0])],
+                                        $this->equalTo($expected_data[0])]
                      );
             $cli->notifiers[] = $notifier;
         }
