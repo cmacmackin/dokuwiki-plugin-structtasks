@@ -68,7 +68,7 @@ END;
 
 $lang['reminder_subject'] = 'Reminder: task "@TITLE@" due in @DUEIN@';
 $lang['reminder_text'] = 'Your task @TITLELINK@ on @WIKINAME@ is due in @DUEIN@, on @DUEDATE@. Be sure to mark the task as completed and edit the page to reflect the outcome once you are finished: @EDITURL@.';
-$lang['reminder_text'] = <<<'END'
+$lang['reminder_html'] = <<<'END'
 <h1>@WIKINAME@ Task Due in @DUEIN@</h1>
 Your task @TITLELINK@ on @WIKINAME@ is due in @DUEIN@, on @DUEDATE@. Be
 sure to mark the task as completed and @EDITURL@
@@ -77,7 +77,7 @@ END;
 
 $lang['today_subject'] = 'Reminder: Task "@TITLE@" due today!';
 $lang['today_text'] = 'Your task @TITLELINK@ on @WIKINAME@ is due today! Please finish it. Once done, be sure to mark the task as completed and edit the page to reflect the outcome: @EDITURL@.';
-$lang['today_text'] = <<<'END'
+$lang['today_html'] = <<<'END'
 <h1>@WIKINAME@ Task Due Today</h1>
 Your task @TITLELINK@ on @WIKINAME@ is due today! Please finish it. Once done,
 be sure to mark the task as completed and @EDITURL@
@@ -86,7 +86,7 @@ END;
 
 $lang['overdue_subject'] = 'Your task "@TITLE@" is overdue!';
 $lang['overdue_text'] = 'Your task @TITLELINK@ on @WIKINAME@ is @DUEIN@ days overdue! Complete it right away and update the page to reflect the outcome: @EDITURL@.';
-$lang['overdue_text'] = <<<'END'
+$lang['overdue_html'] = <<<'END'
 <h1>@WIKINAME@ Task Overdue!</h1>
 Your task @TITLELINK@ on @WIKINAME@ is due today! <strong>Complete it right
 away</strong> and @EDITURL@ to reflect the
