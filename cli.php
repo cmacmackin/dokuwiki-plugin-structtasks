@@ -1,6 +1,10 @@
 <?php
 
 use splitbrain\phpcli\Options;
+use dokuwiki\plugin\structtasks\meta\Utilities;
+use dokuwiki\plugin\structtasks\meta\ReminderNotifier;
+use dokuwiki\plugin\structtasks\meta\TodayNotifier;
+use dokuwiki\plugin\structtasks\meta\OverdueNotifier;
 
 /**
  * DokuWiki Plugin structtasks (CLI Component)
@@ -8,13 +12,6 @@ use splitbrain\phpcli\Options;
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Chris MacMackin <cmacmackin@gmail.com>
  */
-
-use dokuwiki\plugin\structtasks\meta\Utilities;
-use dokuwiki\plugin\structtasks\meta\ReminderNotifier;
-use dokuwiki\plugin\structtasks\meta\TodayNotifier;
-use dokuwiki\plugin\structtasks\meta\OverdueNotifier;
-
-
 class cli_plugin_structtasks extends \dokuwiki\Extension\CLIPlugin
 {
 
@@ -22,32 +19,42 @@ class cli_plugin_structtasks extends \dokuwiki\Extension\CLIPlugin
     private $struct;
     private $util;
     private $dateformat;
+    public $testing = false;
+    public $notifiers = [];
 
     /** @inheritDoc */
     protected function setup(Options $options)
     {
         $options->setHelp('Send emails to users that have been assigned to tasks.');
+        $options->registerOption('verbose', 'Show progress information', 'v', false);
     }
 
     /** @inheritDoc */
-    protected function main(Options $options)
+    public function main(Options $options)
     {
-        if (!$this->initialise()) {
+        $this->notify($options->getOpt('verbose'));
+    }
+
+    /**
+     * Function to run CLI algorithm.
+     */
+    public function notify($verbose = true) {
+        if (!$this->initialise($verbose)) {
             exit(-1);
         }
 
         $notifiers = $this->createNotifiers(
-            array_map('intval', explode(',', $this->getConf('reminder'))),
+            array_map('intval', $this->getConf('reminder')),
             (bool)$this->getConf('overdue_reminder')
         );
 
         $tasks = $this->struct->getPages($this->schema);
         foreach (array_keys($tasks) as $task) {
-            $this->notice(sprintf($this->getLang('msg_processing'), $task));
+            if ($verbose) $this->notice(sprintf($this->getLang('msg_processing'), $task));
             $this->processTask($task, $notifiers);
         }
     }
-
+    
     /**
      * Sets up useful properties for the class. Returns true if
      * initialises successfully (e.g., all configurations are valid,
@@ -78,6 +85,7 @@ class cli_plugin_structtasks extends \dokuwiki\Extension\CLIPlugin
      * @return array<AbstractNotifier>
      */
     function createNotifiers($reminder_days, $overdue) : array {
+        if ($this->testing) return $this->notifiers;
         $notifiers = [];
         $getConf = [$this, 'getConf'];
         $getLang = [$this, 'getLang'];

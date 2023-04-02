@@ -2,6 +2,7 @@
 
 namespace dokuwiki\plugin\structtasks\test;
 
+use splitbrain\phpcli\Options;
 use dokuwiki\plugin\struct\meta\AccessTable;
 use dokuwiki\plugin\struct\test\mock\Assignments;
 use dokuwiki\plugin\structtasks\meta\ReminderNotifier;
@@ -115,5 +116,79 @@ class cli_plugin_structtasks_test extends StructtasksTest {
         $assignments->assignPageSchema($page, 'valid');
 
         $cli->processTask($page, [$notifier]);
+    }
+
+    function testRunCli() {
+        global $auth;
+        $auth->createUser('user1', 'abcdefg', 'Some One', 'so@example.com');
+
+        global $conf;
+        $conf['plugin']['structtasks']['schema'] = 'valid';
+        $this->loadSchemaJSON('valid', '', 100);
+        $cli = plugin_load('cli', 'structtasks');
+        $this->assertTrue($cli->initialise());
+
+        $assignments = Assignments::getInstance();
+        $data = ['duedate' => '2023-03-27',
+                 'assignees' => ['user1'],
+                 'status' => 'Ongoing'];
+
+        $page = [];
+        $page_title = [];
+        $content = [];
+        $expected_data = [];
+
+        $page[] = 'some:page';
+        $page_title[] = 'Some Title';
+        $content[] = "====== {$page_title[0]} ======\nInitial content";
+        $expected_data[] =[
+            'duedate' => date_create($data['duedate']),
+            'assignees' => ['Some One <so@example.com>'],
+            'status' => $data['status'],
+            'content' => $content[0],
+            'duedate_formatted' => '27 Mar 2023',
+        ];
+        $access = AccessTable::getPageAccess('valid', $page[0], time());
+        $access->saveData($data);
+        saveWikiText($page[0], $content[0], 'save 1');
+        $assignments->assignPageSchema($page[0], 'valid');
+
+        $page[] = 'another:page';
+        $page_title[] = 'Another Title';
+        $content[] = "====== {$page_title[1]} ======\nDifferent content";
+        $expected_data[] =[
+            'duedate' => date_create($data['duedate']),
+            'assignees' => ['Some One <so@example.com>'],
+            'status' => $data['status'],
+            'content' => $content[1],
+            'duedate_formatted' => '27 Mar 2023',
+        ];
+        $access = AccessTable::getPageAccess('valid', $page[1], time());
+        $access->saveData($data);
+        saveWikiText($page[1], $content[1], 'save 1');
+        $assignments->assignPageSchema($page[1], 'valid');
+
+        for ($i = 0; $i < 2; $i++) {
+            $notifier = $this->createMock(TodayNotifier::class);
+            $notifier->expects($this->exactly(2))
+                     ->method('sendMessage')
+                     ->withConsecutive([$this->equalTo($page[1]),
+                                        $this->equalTo($page_title[1]),
+                                        $this->equalTo(''),
+                                        $this->equalTo(''),
+                                        $this->equalTo($expected_data[1]),
+                                        $this->equalTo($expected_data[1])],
+                                       [$this->equalTo($page[0]),
+                                        $this->equalTo($page_title[0]),
+                                        $this->equalTo(''),
+                                        $this->equalTo(''),
+                                        $this->equalTo($expected_data[0]),
+                                        $this->equalTo($expected_data[0])],
+                     );
+            $cli->notifiers[] = $notifier;
+        }
+        $cli->testing = true;
+
+        $cli->notify(false);
     }
 }
