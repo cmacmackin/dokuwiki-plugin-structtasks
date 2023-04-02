@@ -92,3 +92,6 @@ Your task @TITLELINK@ on @WIKINAME@ is due today! <strong>Complete it right
 away</strong> and <a href="@EDITURL@">update the page</a> to reflect the
 outcome.
 END;
+
+$lang['msg_invalid_schema'] = 'Schema %s is invalid for use with structtasks';
+$lang['msg_processing'] = 'Processing notifications for task with ID %s';

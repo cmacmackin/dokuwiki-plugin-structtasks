@@ -31,6 +31,14 @@ class ReminderNotifier extends AbstractNotifier
         $this->days_before = $days_before;
     }
 
+    /**
+     * Returns a copy of the array with the list of the days before
+     * the due-date on which to send a reminder.
+     */
+    public function getDaysBefore() : array {
+        return $this->days_before;
+    }
+
     public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
         if (is_null($new_data['duedate'])) return [];
         if ($this->isCompleted($new_data['status'])) return [];
