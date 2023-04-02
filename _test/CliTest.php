@@ -24,6 +24,7 @@ class cli_plugin_structtasks_test extends StructtasksTest {
     function testInitialiseSuccess() {
         global $conf;
         $conf['plugin']['structtasks']['schema'] = 'valid';
+        $conf['plugin']['structtasks']['reminder'] = '7,2,1,0';
         $this->loadSchemaJSON('valid', '', 100);
         $cli = plugin_load('cli', 'structtasks');
         $this->assertTrue($cli->initialise());

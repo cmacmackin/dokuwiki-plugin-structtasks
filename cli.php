@@ -44,8 +44,9 @@ class cli_plugin_structtasks extends \dokuwiki\Extension\CLIPlugin
         }
 
         $notifiers = $this->createNotifiers(
-            array_map('intval', $this->getConf('reminder')),
-            (bool)$this->getConf('overdue_reminder')
+            array_map('intval', explode(',', $this->getConf('reminder'))),
+            (bool)$this->getConf('overdue_reminder'),
+            $verbose
         );
 
         $tasks = $this->struct->getPages($this->schema);
@@ -60,7 +61,11 @@ class cli_plugin_structtasks extends \dokuwiki\Extension\CLIPlugin
      * initialises successfully (e.g., all configurations are valid,
      * necessary plugins available, etc.), false otherwise.
      */
-    public function initialise($verbose = true) : bool {
+    public function initialise($verbose = false) : bool {
+        if (!auth_setup()) {
+            if ($verbose) $this->error($this->getLang('msg_no_auth'));
+            return false;
+        }
         $this->schema = $this->getConf('schema');
         if ($this->schema == '') return false;
         $this->struct = $this->loadHelper('struct', true);
@@ -71,6 +76,8 @@ class cli_plugin_structtasks extends \dokuwiki\Extension\CLIPlugin
                 sprintf($this->getLang('msg_invalid_schema'), $this->schema));
             return false;
         }
+        if ($verbose) $this->success(
+            sprintf($this->getLang('msg_handling_schema'), $this->schema));
         $this->dateformat = $this->util->dateFormat($this->schema);
         return true;
     }
@@ -82,9 +89,10 @@ class cli_plugin_structtasks extends \dokuwiki\Extension\CLIPlugin
      *                                   to send reminders
      * @param bool       $overdue        Whether to send reminders for
      *                                   overdue tasks
+     * @param bool       $verbose        Whether to print status messages
      * @return array<AbstractNotifier>
      */
-    function createNotifiers($reminder_days, $overdue) : array {
+    function createNotifiers($reminder_days, $overdue, $verbose = false) : array {
         if ($this->testing) return $this->notifiers;
         $notifiers = [];
         $getConf = [$this, 'getConf'];
@@ -92,12 +100,24 @@ class cli_plugin_structtasks extends \dokuwiki\Extension\CLIPlugin
         if (($key = array_search(0, $reminder_days)) !== false) {
             unset($reminder_days[$key]);
             $notifiers[] = new TodayNotifier($getConf, $getLang);
+            if ($verbose) $this->notice($this->getLang('msg_today_notifier'));
         }
         if (count($reminder_days) != 0) {
             $notifiers[] = new ReminderNotifier($getConf, $getLang, $reminder_days);
+            if ($verbose) {
+                $days = '';
+                $c = count($reminder_days);
+                if ($c > 1) $days .= implode(
+                    ', ', array_slice($reminder_days, 0, -1)) . ' or ';
+                $days .= $reminder_days[$c - 1];
+                $this->notice(
+                sprintf($this->getLang('msg_reminder_notifier'), $days)
+            );
+            }
         }
         if ($overdue) {
             $notifiers[] = new OverdueNotifier($getConf, $getLang);
+            if ($verbose) $this->notice($this->getLang('msg_overdue_notifier'));
         }
         return $notifiers;
     }

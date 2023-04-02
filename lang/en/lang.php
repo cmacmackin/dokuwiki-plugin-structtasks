@@ -93,5 +93,10 @@ away</strong> and <a href="@EDITURL@">update the page</a> to reflect the
 outcome.
 END;
 
-$lang['msg_invalid_schema'] = 'Schema %s is invalid for use with structtasks';
+$lang['msg_invalid_schema'] = 'Schema "%s" is invalid for use with structtasks';
+$lang['msg_handling_schema'] = 'Sending reminders for tasks in schema "%s"';
 $lang['msg_processing'] = 'Processing notifications for task with ID %s';
+$lang['msg_today_notifier'] = 'Sending notifications for tasks due today';
+$lang['msg_reminder_notifier'] = 'Sending noticiations for tasks due in %s days';
+$lang['msg_overdue_notifier'] = 'Sending notifications for overdue tasks';
+$lang['msg_no_auth'] = 'Could not load authentication plugin to access user data';
