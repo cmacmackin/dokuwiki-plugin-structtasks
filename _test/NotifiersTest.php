@@ -374,36 +374,36 @@ Brief description of the task.',
         $mailer->expects($this->once())
                ->method('to')
                ->with($this->equalTo($old_data['assignees'][0]));
-            $url = DOKU_URL . DOKU_SCRIPT . '?id=' . $this::page_id;
-            $text_replacements = [
-                'TITLE' => $this::page_id,
-                'TITLELINK' => '"' . $this::page_id . "\" <${url}>",
-                'EDITURL' => "${url}&do=edit",
-                'EDITOR' => $this::editor,
-                'STATUS' => $new_data['status'],
-                'PREVSTATUS' => $old_data['status'],
-                'DUEDATE' => $new_data['duedate_formatted'],
-                'PREVDUEDATE' => $old_data['duedate_formatted'],
-                'DUEIN' => DeletedNotifier::dueIn($new_data['duedate']),
-                'WIKINAME' => 'My Test Wiki',
-            ];
-            $html_replacements = [
-                'TITLELINK' => "&ldquo;<a href=\"${url}\">" . $this::page_id . '</a>&rdquo;',
-                'EDITURL' => "<a href=\"${url}&do=edit\">edit the page</a>",
-            ];
-            $expected_subject = "Check substitutions:";
-            foreach($text_replacements as $t) {
-                $expected_subject .= "\n$t";
-            }
-            $mailer->expects($this->once())
-                   ->method('setBody')
-                   ->with($this->equalTo($this::email_text),
-                          $this->equalTo($text_replacements),
-                          $this->equalTo($html_replacements),
-                          $this->equalTo($this::email_html));
-            $mailer->expects($this->once())
-                   ->method('subject')
-                   ->with($this->equalTo($expected_subject));
+        $url = DOKU_URL . DOKU_SCRIPT . '?id=' . $this::page_id;
+        $text_replacements = [
+            'TITLE' => $this::page_id,
+            'TITLELINK' => '"' . $this::page_id . "\" <${url}>",
+            'EDITURL' => "${url}&do=edit",
+            'EDITOR' => $this::editor,
+            'STATUS' => $new_data['status'],
+            'PREVSTATUS' => $old_data['status'],
+            'DUEDATE' => $new_data['duedate_formatted'],
+            'PREVDUEDATE' => $old_data['duedate_formatted'],
+            'DUEIN' => DeletedNotifier::dueIn($new_data['duedate']),
+            'WIKINAME' => 'My Test Wiki',
+        ];
+        $html_replacements = [
+            'TITLELINK' => "&ldquo;<a href=\"${url}\">" . $this::page_id . '</a>&rdquo;',
+            'EDITURL' => "<a href=\"${url}&do=edit\">edit the page</a>",
+        ];
+        $expected_subject = "Check substitutions:";
+        foreach($text_replacements as $t) {
+            $expected_subject .= "\n$t";
+        }
+        $mailer->expects($this->once())
+               ->method('setBody')
+               ->with($this->equalTo($this::email_text),
+                      $this->equalTo($text_replacements),
+                      $this->equalTo($html_replacements),
+                      $this->equalTo($this::email_html));
+        $mailer->expects($this->once())
+               ->method('subject')
+               ->with($this->equalTo($expected_subject));
         $mailer->expects($this->once())->method('send')->with();
         $n = new DeletedNotifier([$this, 'fakeGetConf'], $this->getLangCallback('deleted'));
         $n->sendMessage(
