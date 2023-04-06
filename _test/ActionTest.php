@@ -64,7 +64,6 @@ class action_plugin_structtasks_test extends StructtasksTest {
         $new_data = ['duedate' => '2023-04-10',
                      'assignees' => ['user1', 'user2'],
                      'status' => 'Ongoing'];
-        $expected_old_data = $old_data;
         $expected_old_data =[
             'duedate' => date_create($old_data['duedate']),
             'assignees' => ['Arron Dom Person <adperson@example.com>'],

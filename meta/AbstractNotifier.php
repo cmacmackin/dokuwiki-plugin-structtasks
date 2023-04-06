@@ -144,6 +144,7 @@ abstract class AbstractNotifier
         if (count($notifiable_users) == 0) return;
         global $conf;
         $getLang = $this->getLang;
+        if ($page_title == '') $page_title = $page_id;
         $url = wl($page_id, [], true);
         $text_subs = [
             'TITLE' => $page_title,
