@@ -200,20 +200,20 @@ Brief description of the task.',
                 DeletedNotifier::class, [], $empty_data, $new_data, 'deleted'
             ],
             'New page AssignedNotifier' => [
-                AssignedNotifier::class, $all_but_editor,
-                $new_data, $empty_data, 'assigned'
+                AssignedNotifier::class, $all_but_editor, $new_data,
+                array_replace($new_data, ['content' => '']), 'assigned'
             ],
             'New page DateNotifier' => [
                 DateNotifier::class, [], $new_data,
-                $empty_data, 'date'
+                array_replace($new_data, ['content' => '']), 'date'
             ],
             'New page ClosedStatusNotifier' => [
                 ClosedStatusNotifier::class, [], $new_data,
-                $empty_data, 'closedstatus'
+                array_replace($new_data, ['content' => '']), 'closedstatus'
             ],
             'New page OpenStatusNotifier' => [
                 OpenStatusNotifier::class, [], $old_data,
-                $empty_data, 'openstatus'
+                array_replace($new_data, ['content' => '']), 'openstatus'
             ],
             'Delete page RemovedNotifier' => [
                 RemovedNotifier::class, [],
