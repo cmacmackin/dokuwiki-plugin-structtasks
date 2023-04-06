@@ -213,6 +213,26 @@ Brief description of the task.',
                 OpenStatusNotifier::class, [], $old_data,
                 $empty_data, 'openstatus'
             ],
+            'Delete page RemovedNotifier' => [
+                RemovedNotifier::class, [],
+                $empty_data, $new_data, 'removed'
+            ],
+            'Delete page SelfRemovalNotifier' => [
+                SelfRemovalNotifier::class, [],
+                $empty_data, $old_data, 'selfremoval'
+            ],
+            'Delete page DateNotifier' => [
+                DateNotifier::class, [], $empty_data, $new_data,
+                'date'
+            ],
+            'Delete page ClosedStatusNotifier' => [
+                ClosedStatusNotifier::class, [], $empty_data, $old_data,
+                'closedstatus'
+            ],
+            'Delete page OpenStatusNotifier' => [
+                OpenStatusNotifier::class, [], $empty_data, $new_data,
+                'openstatus'
+            ],
             'ReminderNotifier' => [
                 ReminderNotifier::class, $old_data['assignees'],
                 array_replace($old_data, ['duedate' => $tomorrow]),

@@ -18,6 +18,7 @@ class RemovedNotifier extends AbstractNotifier
 {
     const lang_key_prefix = 'removed';
     public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
+        if ($new_data['content'] === '') return [];
         return array_filter(
             array_diff($old_data['assignees'], $new_data['assignees']),
             function ($val) use ($editor_email) {return $val !== $editor_email;}
