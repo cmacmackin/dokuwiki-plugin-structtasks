@@ -20,7 +20,7 @@ class DateNotifier extends AbstractNotifier
     public function getNotifiableUsers($page, $editor_email, $new_data, $old_data) {
         // Don't send emails for newly-created pages
         if ($old_data['content'] === '' and $new_data['content'] !== '') return [];
-        if ($new_data['duedate'] === $old_data['duedate']) return [];
+        if ($new_data['duedate'] == $old_data['duedate']) return [];
         return array_filter(
             $new_data['assignees'],
             function ($val) use ($editor_email) {return $val !== $editor_email;}

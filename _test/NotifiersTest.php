@@ -120,6 +120,8 @@ Brief description of the task.',
             'assignees' => [ 'User 2 <u2@abc.com>', 'Third Guy <guy3@abc.com>', 'User Four <u4@thingy.co.uk', 'Some User <some.user@example.com>'],
             'status' => 'Ongoing',
         ];
+        $new_data2 = array_replace($new_data, ['duedate' => clone $new_data['duedate']]);
+        $old_data2 = array_replace($old_data, ['duedate' => clone $old_data['duedate']]);
         $all_but_editor = array_slice($new_data['assignees'], 0, -1);
         $empty_data = ['content' => '', 'duedate' => date_create(''),
                        'duedate_formatted' => '', 'assignees' => [], 'status' => ''];
@@ -162,23 +164,23 @@ Brief description of the task.',
             ],
             'Not AssignedNotifier' => [
                 AssignedNotifier::class, [], $new_data,
-                $new_data, 'assigned'
+                $new_data2, 'assigned'
             ],
             'Not RemovedNotifier' => [
                 RemovedNotifier::class, [], $new_data,
-                $new_data, 'removed'
+                $new_data2, 'removed'
             ],
             'Not DateNotifier' => [
                 DateNotifier::class, [], $new_data,
-                $new_data, 'date'
+                $new_data2, 'date'
             ],
             'Not ClosedStatusNotifier' => [
                 ClosedStatusNotifier::class, [], $new_data,
-                $new_data, 'closedstatus'
+                $new_data2, 'closedstatus'
             ],
             'Not OpenStatusNotifier' => [
                 OpenStatusNotifier::class, [], $old_data,
-                $old_data, 'openstatus'
+                $old_data2, 'openstatus'
             ],
             'Not SelfRemovalNotifier' => [
                 SelfRemovalNotifier::class, [], $old_data,
@@ -191,7 +193,7 @@ Brief description of the task.',
                 'self_removal'
             ],
             'Not DeletedNotifier' => [
-                SelfRemovalNotifier::class, [], $new_data,
+                DeletedNotifier::class, [], $new_data,
                 $old_data, 'deleted'
             ],
             'Not DeletedNotifier 2' => [
@@ -258,7 +260,7 @@ Brief description of the task.',
             'TodayNotifier' => [
                 TodayNotifier::class, $old_data['assignees'],
                 array_replace($old_data, ['duedate' => $today]),
-                array_replace($old_data, ['duedate' => $today]),
+                array_replace($old_data, ['duedate' => clone $today]),
                 'today'
             ],            
             'Closed TodayNotifier' => [
@@ -278,7 +280,7 @@ Brief description of the task.',
             ],
             'OverdueNotifier' => [
                 OverdueNotifier::class, $old_data['assignees'], $old_data,
-                $old_data, 'overdue'
+                $old_data2, 'overdue'
             ],
             'Closed OverdueNotifier' => [
                 OverdueNotifier::class, [], $new_data, $new_data, 'overdue'
