@@ -43,7 +43,7 @@ END;
 
 $lang['openstatus_subject'] = 'Task "@TITLE@" has been marked "@STATUS@"';
 $lang['openstatus_text'] = '@EDITOR@ has changed task @TITLELINK@ on @WIKINAME@ from "@PREVSTATUS@" to "@STATUS@". It is due on @DUEDATE@. Be sure to mark the task as completed and edit the page to reflect the outcome once you are finished: @EDITURL@.';
-$lang['openstatus_text'] = <<<'END'
+$lang['openstatus_html'] = <<<'END'
 <h1>@WIKINAME@ Task @STATUS@</h1>
 @EDITOR@ has changed task @TITLELINK@ from "@PREVSTATUS@" to "@STATUS@". It is
 due on @DUEDATE@. Be sure to mark the task as completed and
@@ -53,7 +53,7 @@ END;
 
 $lang['closedstatus_subject'] = 'Task "@TITLE@" has been marked "@STATUS@"';
 $lang['closedstatus_text'] = '@EDITOR@ has changed task @TITLELINK@ on @WIKINAME@ from "@PREVSTATUS@" to "@STATUS@". It is no long considered active and you will receive no further messages about it.';
-$lang['closedstatus_text'] = <<<'END'
+$lang['closedstatus_html'] = <<<'END'
 <h1>@WIKINAME@ Task @STATUS@</h1>
 @EDITOR@ has changed task @TITLELINK@ from "@PREVSTATUS@" to "@STATUS@". It is
 no longer considered active and you will receive no further emails about it.
